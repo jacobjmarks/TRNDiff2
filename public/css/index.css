@@ -2,13 +2,14 @@
     overflow-y: auto;
 }
 
-#div-sidebar-body > .row {
+#div-sidebar-body .row .card {
+    margin-bottom: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#div-sidebar-body .row .card :hover {
+#div-sidebar-body .card-body :hover {
     background-color: rgba(1,1,1,0.1);
     cursor: pointer;
 }

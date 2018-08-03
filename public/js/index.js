@@ -30,26 +30,37 @@ function fetch_RegPrecise() {
             let genomes = data;
 
             for (let genome of genomes) {
-                $("#div-sidebar-body").append(
-                    $("<div>").addClass("row").append(
-                            $("<div>").addClass("card")
-                                .addClass("w-100")
-                                .append(
-                                    $("<div>").addClass("card-body")
-                                        .addClass("py-1")
-                                        .addClass("px-2")
-                                        .text(genome.name)
-                                        .click(() => {
-                                            console.log(genome.genomeId);
-                                        })
-                                )
-                                .append(
-                                    $("<div>").addClass("card-footer")
-                                        .hide()
-                                )
-                        )
-                );
+                let row = $("<div>").addClass("row").append(
+                        $("<div>").addClass("card")
+                            .addClass("w-100")
+                            .append(
+                                $("<div>").addClass("card-body")
+                                    .addClass("py-1")
+                                    .addClass("px-2")
+                                    .text(genome.name)
+                                    .click(() => {
+                                        fetch_RegPreciseRegulatoryNetwork(genome.genomeId, $(row).find(".card-footer"));
+                                    })
+                            )
+                            .append($("<div>").addClass("card-footer").hide())
+                )
+
+                $("#div-sidebar-body").append(row);
             }
+        },
+        error: () => {
+            console.error("Error response from server.");
+        }
+    })
+}
+
+function fetch_RegPreciseRegulatoryNetwork(genomeId, div) {
+    $.ajax({
+        method: "GET",
+        url: `/regprecise/regulatorynetwork/${genomeId}`,
+        success: (data) => {
+            console.log(data);
+            let regulators = data;
         },
         error: () => {
             console.error("Error response from server.");
