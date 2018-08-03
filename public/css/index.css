@@ -5,6 +5,9 @@
 #div-sidebar-body .row .card {
     margin-bottom: 2px;
     white-space: nowrap;
+}
+
+#div-sidebar-body .row .card-body {
     overflow: hidden;
     text-overflow: ellipsis;
 }

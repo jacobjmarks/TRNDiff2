@@ -112,6 +112,6 @@ function updateGraph(elements) {
     graph.remove('*');
     graph.add(elements);
     graph.layout({
-        name: "cose"
+        name: "cola"
     }).run();
 }
