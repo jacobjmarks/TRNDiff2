@@ -1,0 +1,14 @@
+#div-sidebar-body {
+    overflow-y: auto;
+}
+
+#div-sidebar-body > .row {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#div-sidebar-body .row .card :hover {
+    background-color: rgba(1,1,1,0.1);
+    cursor: pointer;
+}
