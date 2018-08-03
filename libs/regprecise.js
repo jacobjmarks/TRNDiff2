@@ -105,6 +105,25 @@ function generateCytoscapeGraph(regulatoryNetwork) {
                 name: regulator.name
             }
         });
+
+        for (let gene of regulator.genes) {
+            for (let queryRegulator of regulators) {
+                if (regulator == queryRegulator) continue;
+                for (let queryGene of queryRegulator.genes) {
+                    if (gene.vimssId == queryGene.vimssId) {
+                        graph.push({
+                            group: "edges",
+                            data: {
+                                id: `${gene.vimssId}_${queryGene.vimssId}`,
+                                source: regulator.vimssId,
+                                target: queryRegulator.vimssId
+                            }
+                        })
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     return graph;

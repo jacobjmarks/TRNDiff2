@@ -109,6 +109,7 @@ function fetch_RegulonDB() {
 }
 
 function updateGraph(elements) {
+    graph.remove('*');
     graph.add(elements);
     graph.layout({
         name: "cose"
