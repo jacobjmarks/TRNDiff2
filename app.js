@@ -20,9 +20,9 @@ app.get("/regprecise/genomes", (req, res) => {
 });
 
 app.get("/regprecise/regulatorynetwork/:genomeId", (req, res) => {
-    regprecise.getRegulatoryNetwork(req.params.genomeId, (err, regulators) => {
+    regprecise.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
         if (err) return res.status(500).end();
-        res.json(regulators);
+        res.json({ network: network, graph: graph });
     });
 });
 

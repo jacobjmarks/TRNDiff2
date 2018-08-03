@@ -13,3 +13,8 @@
     background-color: rgba(1,1,1,0.1);
     cursor: pointer;
 }
+
+#div-graph {
+    width: 500px;
+    height: 500px;
+}

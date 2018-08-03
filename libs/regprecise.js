@@ -85,10 +85,27 @@ module.exports.getRegulatoryNetwork = (genomeId, cb) => {
                     if (network.regulators.length == regulatorCount) {
                         network.regulators.sort((a, b) => a.vimssId - b.vimssId);
                                                 
-                        cb(null, network);
+                        cb(null, network, generateCytoscapeGraph(network));
                     }
                 })
             })
         }
     })
+}
+
+function generateCytoscapeGraph(regulatoryNetwork) {
+    let regulators = regulatoryNetwork.regulators;
+    let graph = [];
+
+    for (let regulator of regulators) {
+        graph.push({
+            group: "nodes",
+            data: {
+                id: regulator.vimssId,
+                name: regulator.name
+            }
+        });
+    }
+
+    return graph;
 }

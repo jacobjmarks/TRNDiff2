@@ -19,6 +19,13 @@ $(document).ready(() => {
                 break;
         }
     })
+
+    $("#div-graph").width($("#div-graph").parent().width());
+    $("#div-graph").height($("#div-graph").parent().height());
+
+    graph = cytoscape({
+        container: $("#div-graph")
+    })
 })
 
 function fetch_RegPrecise() {
@@ -59,8 +66,8 @@ function fetch_RegPreciseRegulatoryNetwork(genomeId, div) {
         method: "GET",
         url: `/regprecise/regulatorynetwork/${genomeId}`,
         success: (data) => {
-            let regulators = data.regulators;
-            console.log(regulators);
+            console.log(data);
+            let regulators = data.network.regulators;
 
             for (let regulator of regulators) {
                 let row = $("<div>").addClass("row").append(
@@ -79,6 +86,8 @@ function fetch_RegPreciseRegulatoryNetwork(genomeId, div) {
             }
 
             $(div).show();
+
+            updateGraph(data.graph);
         },
         error: () => {
             console.error("Error response from server.");
@@ -97,4 +106,11 @@ function fetch_RegulonDB() {
             console.error("Error response from server.");
         }
     })
+}
+
+function updateGraph(elements) {
+    graph.add(elements);
+    graph.layout({
+        name: "cose"
+    }).run();
 }
