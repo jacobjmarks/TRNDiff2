@@ -5,7 +5,7 @@ module.exports.getGenomes = (cb) => {
         method: "GET",
         url: `http://regprecise.lbl.gov/Services/rest/genomes`,
     }, (error, response, body) => {
-        if (response.statusCode != 200) return cb("Error retrieving genomes.");
+        if (error || response.statusCode != 200) return cb("Error retrieving genomes.");
         let genomes = JSON.parse(body)["genome"];
         return cb(null, genomes.length ? genomes : [genomes]);
     })
@@ -16,7 +16,7 @@ module.exports.getRegulons = (genomeId, cb) => {
         method: "GET",
         url: `http://regprecise.lbl.gov/Services/rest/regulons?genomeId=${genomeId}`,
     }, (error, response, body) => {
-        if (response.statusCode != 200) return cb("Error retrieving regulons.");
+        if (error || response.statusCode != 200) return cb("Error retrieving regulons.");
         let regulons = JSON.parse(body)["regulon"];
         return cb(null, regulons.length ? regulons : [regulons]);
     })
@@ -27,7 +27,7 @@ module.exports.getGenes = (regulonId, cb) => {
         method: "GET",
         url: `http://regprecise.lbl.gov/Services/rest/genes?regulonId=${regulonId}`,
     }, (error, response, body) => {
-        if (response.statusCode != 200) return cb("Error retrieving genes.");
+        if (error || response.statusCode != 200) return cb("Error retrieving genes.");
         let genes = JSON.parse(body)["gene"];
         return cb(null, genes.length ? genes : [genes]);
     })
@@ -38,7 +38,7 @@ module.exports.getRegulators = (regulonId, cb) => {
         method: "GET",
         url: `http://regprecise.lbl.gov/Services/rest/regulators?regulonId=${regulonId}`,
     }, (error, response, body) => {
-        if (response.statusCode != 200) return cb("Error retrieving regulator.");
+        if (error || response.statusCode != 200) return cb("Error retrieving regulator.");
         body = JSON.parse(body);
         let regulators = body && body["regulator"];
         if (!regulators) return cb(null, null);
