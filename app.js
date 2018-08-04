@@ -38,8 +38,8 @@ let templates = [
     pug.compileFileClient("./views/templates/regulator.pug", { name: "pugTemplate_regulator" })
 ]
 
-for (let i = 1; i < templates.length; i++) {
-    templates[i] = templates[i].substr(templates[i].lastIndexOf("function"));
-}
+// for (let i = 1; i < templates.length; i++) {
+//     templates[i] = templates[i].substr(templates[i].lastIndexOf("function"));
+// }
 
-fs.writeFileSync("./public/js/pug-templates.js", templates.join(""));
+fs.writeFileSync("./public/js/pug-templates.js", templates.join("\n\n"));

@@ -35,16 +35,36 @@ function fetch_RegPrecise() {
         success: (data) => {
             console.log(data);
             let genomes = data;
+            let rows = [];
 
             for (let genome of genomes) {
-                let row = pugTemplate_genome({
+                let row = $(pugTemplate_genome({
                     name: genome.name,
                     id: genome.genomeId,
                     tid: genome.taxonomyId
-                });
+                }))[0];
 
-                $("#div-sidebar-body").append(row);
+                $(row).click(() => {
+                    fetch_GenomeRegulatoryNetwork(genome.genomeId, (err, regulators, graph) => {
+                        if (err) return window.alert("Error.");
+                        let rows = [];
+                        for (let regulator of regulators) {
+                            let row = $(pugTemplate_regulator({
+                                name: regulator.name
+                            }))[0];
+
+                            rows.push(row);
+                        }
+
+                        populateSideBar(rows);
+                        updateGraph(graph);
+                    });
+                })
+
+                rows.push(row);
             }
+
+            populateSideBar(rows);
         },
         error: () => {
             console.error("Error response from server.");
@@ -52,35 +72,16 @@ function fetch_RegPrecise() {
     })
 }
 
-function fetch_RegPreciseRegulatoryNetwork(genomeId, div) {
+function fetch_GenomeRegulatoryNetwork(genomeId, cb) {
     $.ajax({
         method: "GET",
         url: `/regprecise/regulatorynetwork/${genomeId}`,
         success: (data) => {
             console.log(data);
-            let regulators = data.network.regulators;
-
-            for (let regulator of regulators) {
-                let row = $("<div>").addClass("row").append(
-                    $("<div>").addClass("card")
-                        .addClass("w-100")
-                        .append(
-                            $("<div>").addClass("card-body")
-                                .addClass("py-1")
-                                .addClass("px-2")
-                                .text(regulator.name)
-                        )
-                        .append($("<div>").addClass("card-footer").hide())
-                )
-
-                $(div).append(row);
-            }
-
-            $(div).show();
-
-            updateGraph(data.graph);
+            cb(null, data.network.regulators, data.graph);
         },
         error: () => {
+            cb(true);
             console.error("Error response from server.");
         }
     })
@@ -97,6 +98,14 @@ function fetch_RegulonDB() {
             console.error("Error response from server.");
         }
     })
+}
+
+function populateSideBar(rows) {
+    let sidebar = $("#div-sidebar-body");
+    sidebar.empty();
+    for (let row of rows) {
+        sidebar.append(row);
+    }
 }
 
 function updateGraph(elements) {
