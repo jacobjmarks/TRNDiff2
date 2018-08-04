@@ -6,11 +6,16 @@ $(document).ready(() => {
         $("#div-sidebar").css("height", $(window).height() - 30);
         $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
     })
+
+    $("#div-sidebar").change(() => {
+        $("#div-sidebar").css("height", $(window).height() - 30);
+        $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
+    })
     
-    $("#select-source").change((e) => {
+    $("select#select-source").change((e) => {
         switch(e.target.value) {
             case "regprecise":
-                fetch_RegPrecise();
+                $("select#regprecise-query").show();
                 break;
             case "regulondb":
                 fetch_RegulonDB();
@@ -18,20 +23,26 @@ $(document).ready(() => {
             default:
                 break;
         }
-    })
+    });
 
-    $("#div-graph").width($("#div-graph").parent().width());
-    $("#div-graph").height($("#div-graph").parent().height());
+    $("select#regprecise-query").change((e) => {
+        fetch_RegPrecise(e.target.value);
+    });
+
+    $("#div-graph").height($("#div-graph").parent().parent().height() - $("#div-graph").position().top);
 
     graph = cytoscape({
         container: $("#div-graph")
     })
 })
 
-function fetch_RegPrecise() {
+function fetch_RegPrecise(content) {
+    $("#div-sidebar-title").text("Genomes");
+    $("#div-sidebar-body").empty();
+
     $.ajax({
         method: "GET",
-        url: "/regprecise/genomes",
+        url: `/regprecise/${content}`,
         success: (data) => {
             console.log(data);
             let genomes = data;
@@ -45,6 +56,11 @@ function fetch_RegPrecise() {
                 }))[0];
 
                 $(row).click(() => {
+                    $("#div-sidebar-title").text("Regulators");
+                    $("#div-sidebar-body").empty();
+                    $("#div-sidebar-crumbs ol").append(
+                        $("<li>").addClass("breadcrumb-item").text(genome.name)
+                    )
                     fetch_GenomeRegulatoryNetwork(genome.genomeId, (err, regulators, graph) => {
                         if (err) return window.alert("Error.");
                         let rows = [];
@@ -104,11 +120,13 @@ function fetch_RegulonDB() {
     })
 }
 
+function viewGenomes() {
+
+}
+
 function populateSideBar(rows) {
-    let sidebar = $("#div-sidebar-body");
-    sidebar.empty();
     for (let row of rows) {
-        sidebar.append(row);
+        $("#div-sidebar-body").append(row);
     }
 }
 
