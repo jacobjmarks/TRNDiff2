@@ -2,6 +2,8 @@
     .card-body.py-1.px-2
         .card-title.mb-0.font-weight-bold(title=name)
             | #{name}
-        //- .small.text-muted
-        //-     .float-left ID: #{id}
-        //-     .float-right TaxID: #{tid}
+            .small.d-inline.float-right #{family}
+        .small.text-muted
+            .w-100 Locus Tag: #{locusTag}
+            .float-left VIMSSID: #{id}
+            .float-right RegulonID: #{regulonId}

@@ -50,7 +50,11 @@ function fetch_RegPrecise() {
                         let rows = [];
                         for (let regulator of regulators) {
                             let row = $(pugTemplate_regulator({
-                                name: regulator.name
+                                name: regulator.name,
+                                family: regulator.regulatorFamily,
+                                locusTag: regulator.locusTag,
+                                id: regulator.vimssId,
+                                regulonId: regulator.regulonId
                             }))[0];
 
                             rows.push(row);
