@@ -32,8 +32,23 @@ $(document).ready(() => {
     $("#div-graph").height($("#div-graph").parent().parent().height() - $("#div-graph").position().top);
 
     graph = cytoscape({
-        container: $("#div-graph")
-    })
+        container: $("#div-graph"),
+        style: [
+            {
+                selector: "node",
+                style: {
+                    "label": "data(name)"
+                }
+            }
+        ]
+    });
+
+    graph.on("select", "node", (e) => {
+        e.target.connectedEdges().select();
+    });
+    graph.on("unselect", "node", (e) => {
+        e.target.connectedEdges().deselect();
+    });
 })
 
 function fetch_RegPrecise(content) {
@@ -72,6 +87,15 @@ function fetch_RegPrecise(content) {
                                 id: regulator.vimssId,
                                 regulonId: regulator.regulonId
                             }))[0];
+
+                            $(row).hover(
+                                (e) => { // In
+                                    window.graph.$id(regulator.vimssId).select();
+                                },
+                                (e) => { // Out
+                                    window.graph.$id(regulator.vimssId).deselect();
+                                }
+                            )
 
                             rows.push(row);
                         }
