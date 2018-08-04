@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const pug = require("pug");
+const fs = require("fs");
 
 const regprecise = require("./libs/regprecise.js");
 const regulondb = require("./libs/regulondb.js");
@@ -29,3 +31,5 @@ app.get("/regprecise/regulatorynetwork/:genomeId", (req, res) => {
 app.listen(PORT, () => {
     console.debug("Server listening on port " + PORT);
 });
+
+fs.writeFileSync("./public/js/pug-templates.js", pug.compileFileClient("./views/templates/genome.pug", { name: "pugTemplate_genome" }));

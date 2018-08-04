@@ -37,20 +37,11 @@ function fetch_RegPrecise() {
             let genomes = data;
 
             for (let genome of genomes) {
-                let row = $("<div>").addClass("row").append(
-                        $("<div>").addClass("card")
-                            .addClass("w-100")
-                            .append(
-                                $("<div>").addClass("card-body")
-                                    .addClass("py-1")
-                                    .addClass("px-2")
-                                    .text(genome.name)
-                                    .click(() => {
-                                        fetch_RegPreciseRegulatoryNetwork(genome.genomeId, $(row).find(".card-footer"));
-                                    })
-                            )
-                            .append($("<div>").addClass("card-footer").hide())
-                )
+                let row = pugTemplate_genome({
+                    name: genome.name,
+                    id: genome.genomeId,
+                    tid: genome.taxonomyId
+                });
 
                 $("#div-sidebar-body").append(row);
             }

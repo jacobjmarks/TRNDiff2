@@ -2,22 +2,17 @@
     overflow-y: auto;
 }
 
-#div-sidebar-body .row .card {
-    margin-bottom: 2px;
+#div-sidebar-body .card {
+    margin-bottom: 3px;
     white-space: nowrap;
 }
 
-#div-sidebar-body .row .card-body {
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-#div-sidebar-body .card-body :hover {
-    background-color: rgba(1,1,1,0.1);
+#div-sidebar-body .card :hover {
+    /* background-color: rgba(1,1,1,0.1); */
     cursor: pointer;
 }
 
-#div-graph {
-    width: 500px;
-    height: 500px;
+#div-sidebar-body .card-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
