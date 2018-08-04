@@ -3,7 +3,8 @@
         .card-title.mb-0.font-weight-bold(title=name)
             | #{name}
             .small.d-inline.float-right #{family}
-        .small.text-muted
+        .small.text-muted(style="display:flow-root;")
             .w-100 Locus Tag: #{locusTag}
             .float-left VIMSSID: #{id}
             .float-right RegulonID: #{regulonId}
+        .regulator-desc.small #{desc}

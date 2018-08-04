@@ -85,7 +85,8 @@ function fetch_RegPrecise(content) {
                                 family: regulator.regulatorFamily,
                                 locusTag: regulator.locusTag,
                                 id: regulator.vimssId,
-                                regulonId: regulator.regulonId
+                                regulonId: regulator.regulonId,
+                                desc: regulator.function
                             }))[0];
 
                             $(row).hover(

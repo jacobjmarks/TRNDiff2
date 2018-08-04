@@ -16,3 +16,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+#div-sidebar-body .regulator-desc {
+    white-space: normal;
+}
