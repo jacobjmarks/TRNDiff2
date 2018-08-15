@@ -4,7 +4,7 @@ const pug = require("pug");
 const fs = require("fs");
 
 const regprecise = require("./libs/regprecise.js");
-const regulondb = require("./libs/regulondb.js");
+const regNetwork = require("./libs/reg-network.js");
 
 const PORT = 3000;
 
@@ -22,7 +22,7 @@ app.get("/regprecise/genomes", (req, res) => {
 });
 
 app.get("/regprecise/regulatorynetwork/:genomeId", (req, res) => {
-    regprecise.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
+    regNetwork.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
         if (err) return res.status(500).end();
         res.json({ network: network, graph: graph });
     });

@@ -39,6 +39,13 @@ $(document).ready(() => {
                 style: {
                     "label": "data(name)"
                 }
+            },
+            {
+                selector: "edge",
+                style: {
+                    "curve-style": "bezier",
+                    "target-arrow-shape": "triangle"
+                }
             }
         ]
     });
@@ -102,7 +109,7 @@ function fetch_RegPrecise(content) {
                         }
 
                         populateSideBar(rows);
-                        updateGraph(graph);
+                        drawGraph(graph);
                     });
                 })
 
@@ -155,10 +162,24 @@ function populateSideBar(rows) {
     }
 }
 
-function updateGraph(elements) {
+function drawGraph(elements) {
     graph.remove('*');
     graph.add(elements);
-    graph.layout({
-        name: "cola"
-    }).run();
+
+    graph.nodes(node => node.connectedEdges().empty()).hide();
+
+    let layout = graph.layout({
+        name: "cola",
+        animate: true,
+        refresh: 3,
+        maxSimulationTime: 2000,
+        nodeSpacing: 15
+    })
+
+    layout.one("layoutstop", () => {
+        // Rerun simulation once to achieve better results
+        layout.run();
+    });
+
+    layout.run();
 }
