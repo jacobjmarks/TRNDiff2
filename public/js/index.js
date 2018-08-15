@@ -37,7 +37,9 @@ $(document).ready(() => {
             {
                 selector: "node",
                 style: {
-                    "label": "data(name)"
+                    "label": "data(name)",
+                    "width": "data(size)",
+                    "height": "data(size)"
                 }
             },
             {

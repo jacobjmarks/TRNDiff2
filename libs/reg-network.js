@@ -51,12 +51,20 @@ function generateCytoscapeGraph(regulatoryNetwork) {
     let regulators = regulatoryNetwork.regulators;
     let graph = [];
 
+    let geneCounts = regulators.map(r => r.genes.length);
+    let minGeneCount = Math.min(...geneCounts);
+    let maxGeneCount = Math.max(...geneCounts);
+
+    const minNodeSize = 20;
+    const maxNodeSize = 150;
+
     for (let queryRegulator of regulators) {
         graph.push({
             group: "nodes",
             data: {
                 id: queryRegulator.vimssId,
-                name: queryRegulator.name
+                name: queryRegulator.name,
+                size: minNodeSize + queryRegulator.genes.length / maxGeneCount * (maxNodeSize - minNodeSize)
             }
         });
 
