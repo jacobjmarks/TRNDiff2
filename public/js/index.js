@@ -70,16 +70,27 @@ function addTab() {
         .attr("data-tab", `tab-${tabCount}`)
         .text("New Vis")
 
-    $(".tabular.menu .item[data-tab='tab-new']").before(tab)
+    $(".tabular.menu .item[data-tab='tab-new']").before(tab);
 
-    $(".tabular.menu").parent()
-        .append($("<div>")
-            .addClass(["ui", "tab"])
-            .attr("data-tab", `tab-${tabCount}`))
+    let tabContent = $("<div>")
+        .addClass(["ui", "tab"])
+        .attr("data-tab", `tab-${tabCount}`)
+
+    $(".tabular.menu").parent().append(tabContent);
 
     tab.tab({
-        auto: true,
-        path: '/'
+        onFirstLoad: (tab) => {
+            $.ajax({
+                method: "GET",
+                url: `/tab-${tab}`,
+                success: (data, status, req) => {
+                    tabContent.html(data);
+                },
+                error: () => {
+                    alert("Error creating new tab.");
+                }
+            })
+        }
     });
 
     tab.tab("change tab", `tab-${tabCount}`)

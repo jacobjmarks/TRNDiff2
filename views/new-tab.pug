@@ -1,6 +1,6 @@
 script(src="./js/new-tab.js")
 
-.ui.container
+.ui.container.dimmable
     .selected-data(style="display:none")
         .ui.header Selected Data
 
@@ -10,3 +10,5 @@ script(src="./js/new-tab.js")
         .ui.button.disabled.btn-src(data-source="rpRegulons") Regprecise Regulons
         .ui.button.btn-src(data-source="regulondb") RegulonDB
         .ui.button.disabled.btn-src(data-source="upload") Upload
+    .ui.inverted.dimmer
+        .ui.text.loader Loading
