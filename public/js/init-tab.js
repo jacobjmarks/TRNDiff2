@@ -1,17 +1,27 @@
-$(document).ready(() => {
-    $(".active.tab .dimmer").dimmer({
+function initTab(index) {
+    let tab = $(`.active.tab[data-tab="${index}"`);
+
+    let dimmer = tab.find(".dimmer").dimmer({
         closable: false
     })
 
-    $(".select-data .btn-src").click((e) => {
+    let isLoading = (loading) => {
+        if (loading) {
+            dimmer.dimmer("show");
+        } else {
+            dimmer.dimmer("hide");
+        }
+    }
+
+    tab.find(".select-data .btn-src").click((e) => {
         switch($(e.target).data("source")) {
             case "rpGenomes":
                 isLoading(true);
                 $.ajax({
                     method: "GET",
                     url: "/regprecise/genomes",
-                    success: (data, status, req) => {
-                        populateDataTable(data);
+                    success: (data) => {
+                        console.log(data);
                     },
                     error: (e) => {
                         alert("Error retrieving RegPrecise Genomes");
@@ -26,7 +36,7 @@ $(document).ready(() => {
                 $.ajax({
                     method: "GET",
                     url: "/regulondb",
-                    success: (data, status, req) => {
+                    success: (data) => {
                         console.log(data);
                     },
                     error: (e) => {
@@ -40,12 +50,4 @@ $(document).ready(() => {
                 break;
         }
     })
-})
-
-function isLoading(loading) {
-    if (loading) {
-        $(".active.tab .dimmer").dimmer("show");
-    } else {
-        $(".active.tab .dimmer").dimmer("hide");
-    }
 }

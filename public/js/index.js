@@ -1,7 +1,10 @@
 let tabCount = 0;
 
 $(document).ready(() => {
-    $(".tabular.menu .item[data-tab='tab-new']").click(addTab);
+    $(".tabular.menu .item[data-tab='new']").click(() => {
+        addTab();
+    });
+
     addTab();
     // $("#div-sidebar").css("height", $(window).height() - 30);
     // $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
@@ -67,14 +70,14 @@ $(document).ready(() => {
 function addTab() {
     let tab = $("<div>")
         .addClass("item")
-        .attr("data-tab", `tab-${tabCount}`)
+        .attr("data-tab", `${tabCount}`)
         .text("New Vis")
 
-    $(".tabular.menu .item[data-tab='tab-new']").before(tab);
+    $(".tabular.menu .item[data-tab='new']").before(tab);
 
     let tabContent = $("<div>")
         .addClass(["ui", "tab"])
-        .attr("data-tab", `tab-${tabCount}`)
+        .attr("data-tab", `${tabCount}`)
 
     $(".tabular.menu").parent().append(tabContent);
 
@@ -93,7 +96,7 @@ function addTab() {
         }
     });
 
-    tab.tab("change tab", `tab-${tabCount}`)
+    tab.tab("change tab", `${tabCount}`)
 
     tabCount++;
 }

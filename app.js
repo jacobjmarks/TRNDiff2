@@ -16,7 +16,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/tab-:index", (req, res) => {
-    res.render("new-tab.pug");
+    res.render("new-tab.pug", { tabIndex: req.params.index });
 });
 
 app.get("/regprecise/genomes", (req, res) => {
