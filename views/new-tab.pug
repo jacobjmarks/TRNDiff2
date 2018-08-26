@@ -1,15 +1,23 @@
-script.
-    initTab("#{tabIndex}");
-
 .ui.container.dimmable
+    .ui.inverted.dimmer
+        .ui.text.loader Loading
+
     .selected-data(style="display:none")
         .ui.header Selected Data
 
     .select-data
         .ui.header Select Data Source
-        .ui.button.btn-src(data-source="rpGenomes") Regprecise Genomes
-        .ui.button.disabled.btn-src(data-source="rpRegulons") Regprecise Regulons
-        .ui.button.btn-src(data-source="regulondb") RegulonDB
-        .ui.button.disabled.btn-src(data-source="upload") Upload
-    .ui.inverted.dimmer
-        .ui.text.loader Loading
+        .ui.tabular.menu
+            .item(data-tab="regprecise") RegPrecise
+            .item(data-tab="regulondb") RegulonDB
+            .item.disabled Upload
+        .ui.tab(data-tab="regprecise")
+            .ui.two.basic.buttons
+                .ui.button.btn-src(data-source="rp-genomes") Genomes
+                .ui.button.disabled.btn-src(data-source="rp-regulons") Regulons
+        .ui.tab(data-tab="regulondb")
+            .ui.fluid.basic.button.btn-src(data-source="rdb-genomes") Genomes
+        .ui.tab(data-tab="upload")
+
+script.
+    initTab("#{tabIndex}")

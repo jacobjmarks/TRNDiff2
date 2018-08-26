@@ -15,7 +15,7 @@ function initTab(index) {
 
     tab.find(".select-data .btn-src").click((e) => {
         switch($(e.target).data("source")) {
-            case "rpGenomes":
+            case "rp-genomes":
                 isLoading(true);
                 $.ajax({
                     method: "GET",
@@ -31,7 +31,7 @@ function initTab(index) {
                     }
                 })
                 break;
-            case "regulondb":
+            case "rdb-genomes":
                 isLoading(true);
                 $.ajax({
                     method: "GET",
@@ -50,4 +50,8 @@ function initTab(index) {
                 break;
         }
     })
+
+    tab.find(".select-data .tabular.menu .item").tab({
+        context: tab
+    });
 }

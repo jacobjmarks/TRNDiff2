@@ -1,7 +1,7 @@
 let tabCount = 0;
 
 $(document).ready(() => {
-    $(".tabular.menu .item[data-tab='new']").click(() => {
+    $("#main.tabular.menu > .item[data-tab='new']").click(() => {
         addTab();
     });
 
@@ -73,13 +73,13 @@ function addTab() {
         .attr("data-tab", `${tabCount}`)
         .text("New Vis")
 
-    $(".tabular.menu .item[data-tab='new']").before(tab);
+    $("#main.tabular.menu > .item[data-tab='new']").before(tab);
 
     let tabContent = $("<div>")
         .addClass(["ui", "tab"])
         .attr("data-tab", `${tabCount}`)
 
-    $(".tabular.menu").parent().append(tabContent);
+    $("#main.tabular.menu").parent().append(tabContent);
 
     tab.tab({
         onFirstLoad: (tab) => {
