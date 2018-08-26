@@ -68,10 +68,17 @@ $(document).ready(() => {
 })
 
 function addTab() {
-    let tab = $("<div>")
+    let tab = $("<a>")
         .addClass("item")
         .attr("data-tab", `${tabCount}`)
-        .text("New Vis")
+        .html("New Vis &nbsp;")
+        .append(
+            $("<i>")
+                .addClass(["fitted", "red", "close", "icon", "link"])
+                .click(() => {
+                    // removeTab(tabCount);
+                })
+        )
 
     $("#main.tabular.menu > .item[data-tab='new']").before(tab);
 
@@ -86,8 +93,9 @@ function addTab() {
             $.ajax({
                 method: "GET",
                 url: `/tab-${tab}`,
-                success: (data, status, req) => {
+                success: (data) => {
                     tabContent.html(data);
+                    checkSourceStatus(tabContent);
                 },
                 error: () => {
                     alert("Error creating new tab.");
@@ -96,9 +104,35 @@ function addTab() {
         }
     });
 
-    tab.tab("change tab", `${tabCount}`)
+    tab.tab("change tab", `${tabCount}`);
 
     tabCount++;
+}
+
+function removeTab(index) {
+
+}
+
+function checkSourceStatus(context) {
+    let tab = $(context).find(".tabular.menu .item[data-tab='regprecise']");
+    let tabContent = $(context).find(".tab[data-tab='regprecise']");
+    
+    tab.addClass("disabled");
+    tabContent.attr("data-tab", null);
+
+    // RegPrecise
+    $.get("/regprecise/status").done((status) => {
+        if (status == 200) {
+            tab.find(".icon").addClass("green");
+            tab.removeClass("disabled");
+            tabContent.attr("data-tab", "regprecise");
+        } else {
+            tab.find(".icon").addClass("red");
+        }
+        
+        tab.find(".icon").show();
+        tab.find(".loading").hide();
+    });
 }
 
 function fetch_RegPrecise(content) {

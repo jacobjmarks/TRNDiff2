@@ -8,9 +8,12 @@
     .select-data
         .ui.header Select Data Source
         .ui.tabular.menu
-            .item(data-tab="regprecise") RegPrecise
-            .item(data-tab="regulondb") RegulonDB
-            .item.disabled Upload
+            a.item(data-tab="regprecise")
+                i.small.loading.circle.notch.icon
+                i.small.circle.icon(style="display: none")
+                | RegPrecise
+            a.item(data-tab="regulondb") RegulonDB
+            a.item.disabled Upload
         .ui.tab(data-tab="regprecise")
             .ui.two.basic.buttons
                 .ui.button.btn-src(data-source="rp-genomes") Genomes

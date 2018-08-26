@@ -45,3 +45,12 @@ module.exports.getRegulators = (regulonId, cb) => {
         return cb(null, regulators.length ? regulators : [regulators]);
     })
 }
+
+module.exports.status = (cb) => {
+    request({
+        method: "GET",
+        url: `http://regprecise.lbl.gov/Services/rest/release`,
+    }, (error, response, body) => {
+        cb(error ? 500 : response.statusCode);
+    })
+}

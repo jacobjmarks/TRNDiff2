@@ -1,9 +1,10 @@
+const request = require("request");
 const soap = require("soap");
 
 let soapClient;
 
 module.exports.getRegulators = (cb) => {
-    soap.createClient("http://regulondb.ccg.unam.mx/webservices/NetWork.jws?wsdl", (err, client) => {
+    soap.createClient("http://regulondb.ccg.unam.mx/webservices/NetWork.jws?wsdll", (err, client) => {
         if (err) return cb(err);
 
         client.getTFTF(null, (err, result) => {
