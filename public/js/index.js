@@ -1,63 +1,63 @@
 $(document).ready(() => {
-    $("#div-sidebar").css("height", $(window).height() - 30);
-    $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
+    // $("#div-sidebar").css("height", $(window).height() - 30);
+    // $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
     
-    $(window).resize(() => {
-        $("#div-sidebar").css("height", $(window).height() - 30);
-        $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
-    })
+    // $(window).resize(() => {
+    //     $("#div-sidebar").css("height", $(window).height() - 30);
+    //     $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
+    // })
 
-    $("#div-sidebar").change(() => {
-        $("#div-sidebar").css("height", $(window).height() - 30);
-        $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
-    })
+    // $("#div-sidebar").change(() => {
+    //     $("#div-sidebar").css("height", $(window).height() - 30);
+    //     $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
+    // })
     
-    $("select#select-source").change((e) => {
-        switch(e.target.value) {
-            case "regprecise":
-                $("select#regprecise-query").show();
-                break;
-            case "regulondb":
-                fetch_RegulonDB();
-                break;
-            default:
-                break;
-        }
-    });
+    // $("select#select-source").change((e) => {
+    //     switch(e.target.value) {
+    //         case "regprecise":
+    //             $("select#regprecise-query").show();
+    //             break;
+    //         case "regulondb":
+    //             fetch_RegulonDB();
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // });
 
-    $("select#regprecise-query").change((e) => {
-        fetch_RegPrecise(e.target.value);
-    });
+    // $("select#regprecise-query").change((e) => {
+    //     fetch_RegPrecise(e.target.value);
+    // });
 
-    $("#div-graph").height($("#div-graph").parent().parent().height() - $("#div-graph").position().top);
+    // $("#div-graph").height($("#div-graph").parent().parent().height() - $("#div-graph").position().top);
 
-    graph = cytoscape({
-        container: $("#div-graph"),
-        style: [
-            {
-                selector: "node",
-                style: {
-                    "label": "data(name)",
-                    "width": "data(size)",
-                    "height": "data(size)"
-                }
-            },
-            {
-                selector: "edge",
-                style: {
-                    "curve-style": "bezier",
-                    "target-arrow-shape": "triangle"
-                }
-            }
-        ]
-    });
+    // graph = cytoscape({
+    //     container: $("#div-graph"),
+    //     style: [
+    //         {
+    //             selector: "node",
+    //             style: {
+    //                 "label": "data(name)",
+    //                 "width": "data(size)",
+    //                 "height": "data(size)"
+    //             }
+    //         },
+    //         {
+    //             selector: "edge",
+    //             style: {
+    //                 "curve-style": "bezier",
+    //                 "target-arrow-shape": "triangle"
+    //             }
+    //         }
+    //     ]
+    // });
 
-    graph.on("select", "node", (e) => {
-        e.target.connectedEdges().select();
-    });
-    graph.on("unselect", "node", (e) => {
-        e.target.connectedEdges().deselect();
-    });
+    // graph.on("select", "node", (e) => {
+    //     e.target.connectedEdges().select();
+    // });
+    // graph.on("unselect", "node", (e) => {
+    //     e.target.connectedEdges().deselect();
+    // });
 })
 
 function fetch_RegPrecise(content) {
