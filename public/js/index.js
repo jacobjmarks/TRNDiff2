@@ -1,4 +1,8 @@
+let tabCount = 0;
+
 $(document).ready(() => {
+    $(".tabular.menu .item[data-tab='tab-new']").click(addTab);
+    addTab();
     // $("#div-sidebar").css("height", $(window).height() - 30);
     // $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
     
@@ -59,6 +63,29 @@ $(document).ready(() => {
     //     e.target.connectedEdges().deselect();
     // });
 })
+
+function addTab() {
+    let tab = $("<div>")
+        .addClass("item")
+        .attr("data-tab", `tab-${tabCount}`)
+        .text("New Vis")
+
+    $(".tabular.menu .item[data-tab='tab-new']").before(tab)
+
+    $(".tabular.menu").parent()
+        .append($("<div>")
+            .addClass(["ui", "tab"])
+            .attr("data-tab", `tab-${tabCount}`))
+
+    tab.tab({
+        auto: true,
+        path: '/'
+    });
+
+    tab.tab("change tab", `tab-${tabCount}`)
+
+    tabCount++;
+}
 
 function fetch_RegPrecise(content) {
     $("#div-sidebar-title").text("Genomes");
