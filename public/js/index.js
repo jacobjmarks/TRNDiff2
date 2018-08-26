@@ -68,15 +68,18 @@ $(document).ready(() => {
 })
 
 function addTab() {
+    let tabIndex = tabCount;
+
     let tab = $("<a>")
         .addClass("item")
-        .attr("data-tab", `${tabCount}`)
+        .attr("data-tab", `${tabIndex}`)
         .html("New Vis &nbsp;")
         .append(
             $("<i>")
                 .addClass(["fitted", "red", "close", "icon", "link"])
                 .click(() => {
-                    // removeTab(tabCount);
+                    $(`#main.tabular.menu > .item[data-tab="${tabIndex}"`).remove();
+                    $(`.tab[data-tab="${tabIndex}"`).remove();
                 })
         )
 
@@ -84,7 +87,7 @@ function addTab() {
 
     let tabContent = $("<div>")
         .addClass(["ui", "tab"])
-        .attr("data-tab", `${tabCount}`)
+        .attr("data-tab", `${tabIndex}`)
 
     $("#main.tabular.menu").parent().append(tabContent);
 
@@ -104,13 +107,9 @@ function addTab() {
         }
     });
 
-    tab.tab("change tab", `${tabCount}`);
+    tab.tab("change tab", `${tabIndex}`);
 
     tabCount++;
-}
-
-function removeTab(index) {
-
 }
 
 function checkSourceStatus(context) {
