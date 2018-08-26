@@ -1,6 +1,6 @@
 $(".btn-src").click((e) => {
     switch($(e.target).data("source")) {
-        case "rpgenomes":
+        case "rpGenomes":
             $.ajax({
                 method: "GET",
                 url: "/regprecise/genomes",
@@ -12,6 +12,17 @@ $(".btn-src").click((e) => {
                 }
             })
             break;
+        case "regulondb":
+            $.ajax({
+                method: "GET",
+                url: "/regulondb",
+                success: (data, status, req) => {
+                    console.log(data);
+                },
+                error: (e) => {
+                    alert("Error retrieving RegulonDB");
+                }
+            })
         default:
             break;
     }

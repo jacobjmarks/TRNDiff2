@@ -5,6 +5,7 @@ const fs = require("fs");
 
 const regprecise = require("./libs/regprecise.js");
 const regNetwork = require("./libs/reg-network.js");
+const regulondb = require("./libs/regulondb.js");
 
 const PORT = 3000;
 
@@ -24,6 +25,13 @@ app.get("/regprecise/genomes", (req, res) => {
         res.json(genomes);
     });
 });
+
+app.get("/regulondb", (req, res) => {
+    regulondb.getRegulons((err, network) => {
+        if (err) return res.status(500).end();
+        res.send(network);
+    });
+})
 
 // app.get("/regprecise/regulatorynetwork/:genomeId", (req, res) => {
 //     regNetwork.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
