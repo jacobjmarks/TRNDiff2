@@ -1,1 +1,11 @@
-h1 Hello there
+script(src="./js/new-tab.js")
+
+.ui.container
+    .selected-data(style="display:none")
+        .ui.header Selected Data
+
+    .select-data
+        .ui.header Select Data Source
+        .ui.button.btn-src(data-source="rpgenomes") Regprecise Genomes
+        .ui.button.disabled.btn-src(data-source="rpregulons") Regprecise Regulons
+        .ui.button.disabled.btn-src(data-source="upload") Upload

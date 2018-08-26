@@ -18,12 +18,12 @@ app.get("/tab-:index", (req, res) => {
     res.render("new-tab.pug");
 });
 
-// app.get("/regprecise/genomes", (req, res) => {
-//     regprecise.getGenomes((err, genomes) => {
-//         if (err) return res.status(500).end();
-//         res.json(genomes);
-//     });
-// });
+app.get("/regprecise/genomes", (req, res) => {
+    regprecise.getGenomes((err, genomes) => {
+        if (err) return res.status(500).end();
+        res.json(genomes);
+    });
+});
 
 // app.get("/regprecise/regulatorynetwork/:genomeId", (req, res) => {
 //     regNetwork.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
