@@ -1,5 +1,9 @@
 let tabCount = 0;
 
+let getPage = () => {
+    return $(`.active.page.tab`);
+}
+
 $(document).ready(() => {
     $("#main.tabular.menu > .item[data-tab='new']").click(() => {
         addTab();
@@ -86,8 +90,9 @@ function addTab() {
     $("#main.tabular.menu > .item[data-tab='new']").before(tab);
 
     let tabContent = $("<div>")
-        .addClass(["ui", "tab"])
+        .addClass(["ui", "page", "tab"])
         .attr("data-tab", `${tabIndex}`)
+        .data("selectedData", []);
 
     $("#main.tabular.menu").parent().append(tabContent);
 

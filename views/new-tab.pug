@@ -4,6 +4,13 @@
 
     .selected-data(style="display:none")
         .ui.header Selected Data
+        table.ui.table
+            thead
+                tr
+                    th Source
+                    th Type
+                    th Name
+            tbody
 
     .select-data
         .ui.header Select Data Source
@@ -16,15 +23,17 @@
             a.item.disabled Upload
         .ui.tab(data-tab="regprecise")
             .ui.two.basic.buttons
-                .ui.button.btn-src(data-source="rp-genomes") Genomes
-                .ui.button.disabled.btn-src(data-source="rp-regulons") Regulons
+                button.ui.button.btn-src(data-source="rp-genomes") Genomes
+                button.ui.button.disabled.btn-src(data-source="rp-regulons") Regulons
         .ui.tab(data-tab="regulondb")
             .ui.two.basic.buttons
-                .ui.button.btn-src(data-source="rdb-genomes") Genomes
-                .ui.button.btn-src(data-source="rdb-regulators") Regulators
+                button.ui.button.btn-src(data-source="rdb-genomes") Genomes
+                button.ui.button.btn-src(data-source="rdb-regulators") Regulators
         .ui.tab(data-tab="upload")
 
         table.ui.single.line.compact.sortable.selectable.table
+        
+        button.ui.positive.button.right.floated.btn-add-data Add
 
 script.
     initTab("#{tabIndex}")

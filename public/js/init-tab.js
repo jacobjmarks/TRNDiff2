@@ -1,5 +1,5 @@
 function initTab(index) {
-    let tab = $(`.active.tab[data-tab="${index}"`);
+    let tab = $(`.active.tab[data-tab="${index}"]`);
 
     let dimmer = tab.find(".dimmer").dimmer({
         closable: false
@@ -62,6 +62,11 @@ function initTab(index) {
         }
     })
 
+    tab.find("button.btn-add-data").click((e) => {
+        let table = $(".select-data table");
+        selectData(table.find(".active").data("query"));
+    });
+
     tab.find(".select-data .tabular.menu .item").tab({
         context: tab
     });
@@ -83,13 +88,45 @@ function populateDataTable(tab, headers, rows) {
         tr.css("cursor", "pointer");
 
         tr.click(() => {
-            tBody.find("tr[class='active']").removeClass("active");
+            tBody.find("tr.active").removeClass("active");
             tr.addClass("active");
         })
+
+        tr.data("query", {
+            source: "RegulonDB",
+            type: "Genome",
+            name: row[0],
+            id: undefined
+        });
 
         tBody.append(tr);
     }
 
     table.append(tBody);
     table.tablesort();
+}
+
+function selectData(data) {
+    let page = getPage();
+    page.data("selectedData").push(data);
+
+    populateSelectedData();
+
+    page.find(".select-data").hide();
+    page.find(".selected-data").show();
+}
+
+function populateSelectedData() {
+    let page = getPage();
+    let tableBody = page.find(".selected-data table > tbody");
+    tableBody.empty();
+
+    page.data("selectedData").forEach((d) => {
+        tableBody.append(
+            $("<tr>")
+                .append($("<td>").text(d.source))
+                .append($("<td>").text(d.type))
+                .append($("<td>").text(d.name))
+        );
+    });
 }
