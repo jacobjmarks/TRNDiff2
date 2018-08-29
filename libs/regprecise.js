@@ -51,6 +51,6 @@ module.exports.status = (cb) => {
         method: "GET",
         url: `http://regprecise.lbl.gov/Services/rest/release`,
     }, (error, response, body) => {
-        cb(error ? new Error(error) : response.statusCode);
+        cb(error ? new Error(error) : null, response.statusCode);
     })
 }
