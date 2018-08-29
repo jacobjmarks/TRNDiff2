@@ -37,26 +37,6 @@ function initTab(index) {
                     [["Escherichia coli K-12"]]
                 );
                 break;
-            case "rdb-regulators":
-                isLoading(true);
-                $.ajax({
-                    method: "GET",
-                    url: "/regulondb",
-                    success: (data) => {
-                        let tableData = data.regulators.map(t => [t.name, t.genes.length]);
-                        populateDataTable(tab,
-                            ["Name", "Gene Count"],
-                            tableData
-                        );
-                    },
-                    error: (e) => {
-                        alert("Error retrieving RegulonDB");
-                    },
-                    complete: () => {                    
-                        isLoading(false);
-                    }
-                })
-                break;
             default:
                 break;
         }
