@@ -9,24 +9,47 @@ module.exports.getRegulators = (cb) => {
 
         client.getTFTF(null, (err, result) => {
             if (err) return cb(new Error(err));
-            cb(null, parseResponseTSV(result.getTFTFReturn.$value));
+
+            let network;
+            try {
+                network = parseToTRNetwork(result.getTFTFReturn.$value);
+            } catch (e) {
+                console.log("Error parsing RegulonDB tsv.");
+                return cb(e);
+            }
+
+            cb(null, network);
         });
     })
 }
 
-function parseResponseTSV(tsv) {
-    let result = [];
+function parseToTRNetwork(tsv) {
+    let network = {
+        genomeName: undefined,
+        regulators: []
+    }
 
     for (let line of tsv.split('\n')) {
-        let values =  line.split('\t');
-        result.push({
-            regulator: values[0],
-            regulates: values[1],
-            effect: values[2],
-            evidence: values[3],
-            strength: values[4]
+        const values = line.split('\t');
+        let regulatorName = values[0];
+        let regulatedGene = values[1];
+        let effect = values[2];
+        let evidence = values[3];
+        let strength = values[4];
+
+        let rIndex = network.regulators.findIndex(r => r.name == regulatorName);
+        if (rIndex == -1) {
+            network.regulators.push({ name: regulatorName, genes: [] });
+            rIndex = network.regulators.length - 1;
+        }
+
+        network.regulators[rIndex].genes.push({
+            name: regulatedGene,
+            effect: effect,
+            strength: strength,
+            evidence: evidence
         });
     }
 
-    return result;
+    return network;
 }

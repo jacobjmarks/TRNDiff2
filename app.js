@@ -36,7 +36,7 @@ app.get("/regprecise/genomes", (req, res) => {
 app.get("/regulondb", (req, res) => {
     regulondb.getRegulators((err, network) => {
         if (err) { console.error(err); return res.status(500).end(); }
-        res.send(network);
+        res.json(network);
     });
 });
 
