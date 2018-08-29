@@ -79,6 +79,14 @@ function populateDataTable(tab, headers, rows) {
         for (let datum of row) {
             tr.append(`<td data-sort-value="${datum}">${datum}</td>`);
         }
+
+        tr.css("cursor", "pointer");
+
+        tr.click(() => {
+            tBody.find("tr[class='active']").removeClass("active");
+            tr.addClass("active");
+        })
+
         tBody.append(tr);
     }
 
