@@ -20,28 +20,29 @@ app.get("/tab-:index", (req, res) => {
 });
 
 app.get("/regprecise/status", (req, res) => {
-    regprecise.status((status) => {
+    regprecise.status((err, status) => {
+        if (err) { console.error(err); return res.status(500).end(); }
         res.send(`${status}`);
     });
 });
 
 app.get("/regprecise/genomes", (req, res) => {
     regprecise.getGenomes((err, genomes) => {
-        if (err) return res.status(500).end();
+        if (err) { console.error(err); return res.status(500).end(); }
         res.json(genomes);
     });
 });
 
 app.get("/regulondb", (req, res) => {
     regulondb.getRegulators((err, network) => {
-        if (err) return res.status(500).end();
+        if (err) { console.error(err); return res.status(500).end(); }
         res.send(network);
     });
 });
 
 // app.get("/regprecise/regulatorynetwork/:genomeId", (req, res) => {
 //     regNetwork.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
-//         if (err) return res.status(500).end();
+//         if (err) { console.error(err); return res.status(500).end(); }
 //         res.json({ network: network, graph: graph });
 //     });
 // });
