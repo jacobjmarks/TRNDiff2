@@ -34,22 +34,29 @@ function initTab(index) {
             case "rdb-genomes":
                 populateDataTable(tab,
                     ["Name"],
-                    ["E Coli"]
+                    [["Escherichia coli K-12"]]
                 );
-                // isLoading(true);
-                // $.ajax({
-                //     method: "GET",
-                //     url: "/regulondb",
-                //     success: (data) => {
-                //         console.log(data);
-                //     },
-                //     error: (e) => {
-                //         alert("Error retrieving RegulonDB");
-                //     },
-                //     complete: () => {                    
-                //         isLoading(false);
-                //     }
-                // })
+                break;
+            case "rdb-regulators":
+                isLoading(true);
+                $.ajax({
+                    method: "GET",
+                    url: "/regulondb",
+                    success: (data) => {
+                        let tableData = data.regulators.map(t => [t.name, t.genes.length]);
+                        populateDataTable(tab,
+                            ["Name", "Gene Count"],
+                            tableData
+                        );
+                    },
+                    error: (e) => {
+                        alert("Error retrieving RegulonDB");
+                    },
+                    complete: () => {                    
+                        isLoading(false);
+                    }
+                })
+                break;
             default:
                 break;
         }
@@ -65,5 +72,11 @@ function populateDataTable(tab, headers, rows) {
     table.empty();
 
     table.append($("<thead>").append(`<tr><th>${headers.join("</th><th>")}</th></tr>`));
-    table.append($("<tbody>").append(`<tr><td>${rows.join("</td><td>")}</td></tr>`));
+
+    let tBody = $("<tbody>");
+    for (let row of rows) {
+        tBody.append(`<tr><td>${row.join("</td><td>")}</td></tr>`);
+    }
+
+    table.append(tBody);
 }

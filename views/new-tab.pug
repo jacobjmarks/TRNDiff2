@@ -19,10 +19,12 @@
                 .ui.button.btn-src(data-source="rp-genomes") Genomes
                 .ui.button.disabled.btn-src(data-source="rp-regulons") Regulons
         .ui.tab(data-tab="regulondb")
-            .ui.fluid.basic.button.btn-src(data-source="rdb-genomes") Genomes
+            .ui.two.basic.buttons
+                .ui.button.btn-src(data-source="rdb-genomes") Genomes
+                .ui.button.btn-src(data-source="rdb-regulators") Regulators
         .ui.tab(data-tab="upload")
 
-        table.ui.celled.table
+        table.ui.single.line.compact.sortable.selectable.table
 
 script.
     initTab("#{tabIndex}")
