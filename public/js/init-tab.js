@@ -32,20 +32,24 @@ function initTab(index) {
                 })
                 break;
             case "rdb-genomes":
-                isLoading(true);
-                $.ajax({
-                    method: "GET",
-                    url: "/regulondb",
-                    success: (data) => {
-                        console.log(data);
-                    },
-                    error: (e) => {
-                        alert("Error retrieving RegulonDB");
-                    },
-                    complete: () => {                    
-                        isLoading(false);
-                    }
-                })
+                populateDataTable(tab,
+                    ["Name"],
+                    ["E Coli"]
+                );
+                // isLoading(true);
+                // $.ajax({
+                //     method: "GET",
+                //     url: "/regulondb",
+                //     success: (data) => {
+                //         console.log(data);
+                //     },
+                //     error: (e) => {
+                //         alert("Error retrieving RegulonDB");
+                //     },
+                //     complete: () => {                    
+                //         isLoading(false);
+                //     }
+                // })
             default:
                 break;
         }
@@ -54,4 +58,12 @@ function initTab(index) {
     tab.find(".select-data .tabular.menu .item").tab({
         context: tab
     });
+}
+
+function populateDataTable(tab, headers, rows) {
+    let table = tab.find(".select-data table");
+    table.empty();
+
+    table.append($("<thead>").append(`<tr><th>${headers.join("</th><th>")}</th></tr>`));
+    table.append($("<tbody>").append(`<tr><td>${rows.join("</td><td>")}</td></tr>`));
 }
