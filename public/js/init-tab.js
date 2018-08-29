@@ -75,8 +75,13 @@ function populateDataTable(tab, headers, rows) {
 
     let tBody = $("<tbody>");
     for (let row of rows) {
-        tBody.append(`<tr><td>${row.join("</td><td>")}</td></tr>`);
+        let tr = $("<tr>");
+        for (let datum of row) {
+            tr.append(`<td data-sort-value="${datum}">${datum}</td>`);
+        }
+        tBody.append(tr);
     }
 
     table.append(tBody);
+    table.tablesort();
 }
