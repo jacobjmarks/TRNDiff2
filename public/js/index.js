@@ -1,15 +1,57 @@
 let tabCount = 0;
 
-let getPage = () => {
-    return $(`.active.page.tab`);
+// let selectedData = [];
+
+let isLoading = (loading) => {
+    if (loading) {
+        $(".dimmer").dimmer("show");
+    } else {
+        $(".dimmer").dimmer("hide");
+    }
 }
 
 $(document).ready(() => {
-    $("#main.tabular.menu > .item[data-tab='new']").click(() => {
-        addTab();
+    $(".dimmer").dimmer({
+        closable: false
+    })
+
+    $(".select-data .btn-src").click((e) => {
+        switch($(e.target).data("source")) {
+            case "rp-genomes":
+                isLoading(true);
+                $.ajax({
+                    method: "GET",
+                    url: "/regprecise/genomes",
+                    success: (data) => {
+                        console.log(data);
+                    },
+                    error: (e) => {
+                        alert("Error retrieving RegPrecise Genomes");
+                    },
+                    complete: () => {                    
+                        isLoading(false);
+                    }
+                })
+                break;
+            case "rdb-genomes":
+                populateDataTable(
+                    ["Name"],
+                    [["Escherichia coli K-12"]]
+                );
+                break;
+            default:
+                break;
+        }
+    })
+
+    $("button.btn-add-data").click((e) => {
+        let table = $(".select-data table");
+        selectData(table.find(".active").data("query"));
     });
 
-    addTab();
+    $(".select-data .tabular.menu .item").tab();
+
+    checkSourceStatus();
     // $("#div-sidebar").css("height", $(window).height() - 30);
     // $("#div-sidebar-body").css("height", $(window).height() - $("#div-sidebar-body").position().top - 45);
     
@@ -71,55 +113,9 @@ $(document).ready(() => {
     // });
 })
 
-function addTab() {
-    let tabIndex = tabCount;
-
-    let tab = $("<a>")
-        .addClass("item")
-        .attr("data-tab", `${tabIndex}`)
-        .html("New Vis &nbsp;")
-        .append(
-            $("<i>")
-                .addClass(["fitted", "red", "close", "icon", "link"])
-                .click(() => {
-                    $(`#main.tabular.menu > .item[data-tab="${tabIndex}"`).remove();
-                    $(`.tab[data-tab="${tabIndex}"`).remove();
-                })
-        )
-
-    $("#main.tabular.menu > .item[data-tab='new']").before(tab);
-
-    let tabContent = $("<div>")
-        .addClass(["ui", "page", "tab"])
-        .attr("data-tab", `${tabIndex}`)
-        .data("selectedData", []);
-
-    $("#main.tabular.menu").parent().append(tabContent);
-
-    tab.tab({
-        onFirstLoad: (tab) => {
-            $.ajax({
-                method: "GET",
-                url: `/tab-${tab}`,
-                success: (data) => {
-                    tabContent.html(data);
-                    checkSourceStatus(tabContent);
-                },
-                error: () => {
-                    alert("Error creating new tab.");
-                }
-            })
-        }
-    });
-
-    tab.tab("change tab", `${tabIndex}`);
-
-    tabCount++;
-}
-
-function checkSourceStatus(context) {
-    let tab = $(context).find(".tabular.menu .item[data-tab='regprecise']");
-    let tabContent = $(context).find(".tab[data-tab='regprecise']");
+function checkSourceStatus() {
+    let tab = $(".tabular.menu .item[data-tab='regprecise']");
+    let tabContent = $(".tab[data-tab='regprecise']");
     
     tab.addClass("disabled");
     tabContent.attr("data-tab", null);
@@ -139,108 +135,38 @@ function checkSourceStatus(context) {
     });
 }
 
-function fetch_RegPrecise(content) {
-    $("#div-sidebar-title").text("Genomes");
-    $("#div-sidebar-body").empty();
+function populateDataTable(headers, rows) {
+    let table = $(".select-data table");
+    table.empty();
 
-    $.ajax({
-        method: "GET",
-        url: `/regprecise/${content}`,
-        success: (data) => {
-            console.log(data);
-            let genomes = data;
-            let rows = [];
+    table.append($("<thead>").append(`<tr><th>${headers.join("</th><th>")}</th></tr>`));
 
-            for (let genome of genomes) {
-                let row = $(pugTemplate_genome({
-                    name: genome.name,
-                    id: genome.genomeId,
-                    tid: genome.taxonomyId
-                }))[0];
-
-                $(row).click(() => {
-                    $("#div-sidebar-title").text("Regulators");
-                    $("#div-sidebar-body").empty();
-                    $("#div-sidebar-crumbs ol").append(
-                        $("<li>").addClass("breadcrumb-item").text(genome.name)
-                    )
-                    fetch_GenomeRegulatoryNetwork(genome.genomeId, (err, regulators, graph) => {
-                        if (err) return window.alert("Error.");
-                        let rows = [];
-                        for (let regulator of regulators) {
-                            let row = $(pugTemplate_regulator({
-                                name: regulator.name,
-                                family: regulator.regulatorFamily,
-                                locusTag: regulator.locusTag,
-                                id: regulator.vimssId,
-                                regulonId: regulator.regulonId,
-                                desc: regulator.function
-                            }))[0];
-
-                            $(row).hover(
-                                (e) => { // In
-                                    window.graph.$id(regulator.vimssId).select();
-                                },
-                                (e) => { // Out
-                                    window.graph.$id(regulator.vimssId).deselect();
-                                }
-                            )
-
-                            rows.push(row);
-                        }
-
-                        populateSideBar(rows);
-                        drawGraph(graph);
-                    });
-                })
-
-                rows.push(row);
-            }
-
-            populateSideBar(rows);
-        },
-        error: () => {
-            console.error("Error response from server.");
-        }
-    })
-}
-
-function fetch_GenomeRegulatoryNetwork(genomeId, cb) {
-    $.ajax({
-        method: "GET",
-        url: `/regprecise/regulatorynetwork/${genomeId}`,
-        success: (data) => {
-            console.log(data);
-            cb(null, data.network.regulators, data.graph);
-        },
-        error: () => {
-            cb(true);
-            console.error("Error response from server.");
-        }
-    })
-}
-
-function fetch_RegulonDB() {
-    $.ajax({
-        method: "GET",
-        url: "/regulondb/",
-        success: (data) => {
-            console.log(data);
-        },
-        error: () => {
-            console.error("Error response from server.");
-        }
-    })
-}
-
-function viewGenomes() {
-
-}
-
-function populateSideBar(rows) {
+    let tBody = $("<tbody>");
     for (let row of rows) {
-        $("#div-sidebar-body").append(row);
+        let tr = $("<tr>");
+        for (let datum of row) {
+            tr.append(`<td data-sort-value="${datum}">${datum}</td>`);
+        }
+
+        tr.css("cursor", "pointer");
+
+        tr.click(() => {
+            tBody.find("tr.active").removeClass("active");
+            tr.addClass("active");
+        })
+
+        tr.data("query", {
+            source: "RegulonDB",
+            type: "Genome",
+            name: row[0],
+            id: undefined
+        });
+
+        tBody.append(tr);
     }
+
+    table.append(tBody);
+    table.tablesort();
 }
 
 function drawGraph(elements) {
@@ -264,3 +190,130 @@ function drawGraph(elements) {
 
     layout.run();
 }
+
+// function selectData(data) {
+//     selectedData.push(data);
+
+//     populateSelectedData();
+
+//     $(".select-data").hide();
+//     $(".selected-data").show();
+// }
+
+// function populateSelectedData() {
+//     let tableBody = $(".selected-data table > tbody");
+//     tableBody.empty();
+
+//     selectedData.forEach((d) => {
+//         tableBody.append(
+//             $("<tr>")
+//                 .append($("<td>").text(d.source))
+//                 .append($("<td>").text(d.type))
+//                 .append($("<td>").text(d.name))
+//         );
+//     });
+// }
+
+// function fetch_RegPrecise(content) {
+//     $("#div-sidebar-title").text("Genomes");
+//     $("#div-sidebar-body").empty();
+
+//     $.ajax({
+//         method: "GET",
+//         url: `/regprecise/${content}`,
+//         success: (data) => {
+//             console.log(data);
+//             let genomes = data;
+//             let rows = [];
+
+//             for (let genome of genomes) {
+//                 let row = $(pugTemplate_genome({
+//                     name: genome.name,
+//                     id: genome.genomeId,
+//                     tid: genome.taxonomyId
+//                 }))[0];
+
+//                 $(row).click(() => {
+//                     $("#div-sidebar-title").text("Regulators");
+//                     $("#div-sidebar-body").empty();
+//                     $("#div-sidebar-crumbs ol").append(
+//                         $("<li>").addClass("breadcrumb-item").text(genome.name)
+//                     )
+//                     fetch_GenomeRegulatoryNetwork(genome.genomeId, (err, regulators, graph) => {
+//                         if (err) return window.alert("Error.");
+//                         let rows = [];
+//                         for (let regulator of regulators) {
+//                             let row = $(pugTemplate_regulator({
+//                                 name: regulator.name,
+//                                 family: regulator.regulatorFamily,
+//                                 locusTag: regulator.locusTag,
+//                                 id: regulator.vimssId,
+//                                 regulonId: regulator.regulonId,
+//                                 desc: regulator.function
+//                             }))[0];
+
+//                             $(row).hover(
+//                                 (e) => { // In
+//                                     window.graph.$id(regulator.vimssId).select();
+//                                 },
+//                                 (e) => { // Out
+//                                     window.graph.$id(regulator.vimssId).deselect();
+//                                 }
+//                             )
+
+//                             rows.push(row);
+//                         }
+
+//                         populateSideBar(rows);
+//                         drawGraph(graph);
+//                     });
+//                 })
+
+//                 rows.push(row);
+//             }
+
+//             populateSideBar(rows);
+//         },
+//         error: () => {
+//             console.error("Error response from server.");
+//         }
+//     })
+// }
+
+// function fetch_GenomeRegulatoryNetwork(genomeId, cb) {
+//     $.ajax({
+//         method: "GET",
+//         url: `/regprecise/regulatorynetwork/${genomeId}`,
+//         success: (data) => {
+//             console.log(data);
+//             cb(null, data.network.regulators, data.graph);
+//         },
+//         error: () => {
+//             cb(true);
+//             console.error("Error response from server.");
+//         }
+//     })
+// }
+
+// function fetch_RegulonDB() {
+//     $.ajax({
+//         method: "GET",
+//         url: "/regulondb/",
+//         success: (data) => {
+//             console.log(data);
+//         },
+//         error: () => {
+//             console.error("Error response from server.");
+//         }
+//     })
+// }
+
+// function viewGenomes() {
+
+// }
+
+// function populateSideBar(rows) {
+//     for (let row of rows) {
+//         $("#div-sidebar-body").append(row);
+//     }
+// }
