@@ -1,4 +1,5 @@
 $(document).ready(() => {
+    isLoading(true);
     $("#graph").height($("#graph").parent().parent().height() - $("#graph").position().top);
 
     graph = cytoscape({
@@ -36,6 +37,9 @@ $(document).ready(() => {
         },
         error: () => {
             alert("Error drawing graph.");
+        },
+        complete: () => {            
+            isLoading(false);
         }
     })
 })
@@ -49,15 +53,17 @@ function drawGraph(elements) {
     let layout = graph.layout({
         name: "cola",
         animate: true,
+        infinite: true,
         refresh: 3,
-        maxSimulationTime: 2000,
+        // maxSimulationTime: 2000,
         nodeSpacing: 15
     })
 
-    layout.one("layoutstop", () => {
-        // Rerun simulation once to achieve better results
-        layout.run();
-    });
+    // layout.one("layoutstop", () => {
+    //     layout.on("layoutstop", () => isLoading(false));
+    //     // Rerun simulation once to achieve better results
+    //     layout.run();
+    // });
 
     layout.run();
 }

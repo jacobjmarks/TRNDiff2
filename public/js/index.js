@@ -1,20 +1,6 @@
-let tabCount = 0;
-
 // let selectedData = [];
 
-let isLoading = (loading) => {
-    if (loading) {
-        $(".dimmer").dimmer("show");
-    } else {
-        $(".dimmer").dimmer("hide");
-    }
-}
-
 $(document).ready(() => {
-    $(".dimmer").dimmer({
-        closable: false
-    })
-
     $("#select-data .btn-src").click((e) => {
         switch($(e.target).data("source")) {
             case "rp-genomes":
