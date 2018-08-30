@@ -33,11 +33,22 @@ app.get("/regprecise/genomes", (req, res) => {
     });
 });
 
-app.get("/regulondb/regulators", (req, res) => {
+app.get("/regulondb/genome/:id", (req, res) => {
     regulondb.getRegulators((err, network) => {
         if (err) { console.error(err); return res.status(500).end(); }
-        res.json(network);
+        res.json(req.query.graphable ? regNetwork.trNetworkToGraph(network) : network);
     });
+});
+
+app.get("/graph", (req, res) => {
+    if (!Object.keys(req.query).length || !req.query.source || !req.query.type || !req.query.id) {
+        res.statusCode = 302;
+        res.location("/");
+        res.end();
+        return;
+    }
+
+    res.render("graph.pug", { query: JSON.stringify(req.query) });
 });
 
 // app.get("/regprecise/regulatorynetwork/:genomeId", (req, res) => {

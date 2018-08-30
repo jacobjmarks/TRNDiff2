@@ -1,0 +1,12 @@
+extends layout
+
+block scripts
+    script.
+        let query = !{query}
+
+    script(src="./js/graph.js")
+
+block content
+    .ui.huge.header TRNetwork Graph
+
+    #graph.ui.fluid.container

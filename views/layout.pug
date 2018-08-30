@@ -19,9 +19,12 @@ html
         script(src="./js/cytoscape-cola.js")
         script(src="./js/tablesort.js")
 
-        script(src="./js/index.js")
-        script(src="./js/init-tab.js")
+        block scripts
 
         title Capstone Proto
     body
-        block content
+        .ui.container.dimmable
+            .ui.inverted.dimmer
+                .ui.text.loader Loading
+
+            block content

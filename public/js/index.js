@@ -15,7 +15,7 @@ $(document).ready(() => {
         closable: false
     })
 
-    $(".select-data .btn-src").click((e) => {
+    $("#select-data .btn-src").click((e) => {
         switch($(e.target).data("source")) {
             case "rp-genomes":
                 isLoading(true);
@@ -44,12 +44,12 @@ $(document).ready(() => {
         }
     })
 
-    $("button.btn-add-data").click((e) => {
-        let table = $(".select-data table");
-        selectData(table.find(".active").data("query"));
-    });
+    // $("button#btn-add-data").click((e) => {
+    //     let table = $("#select-data table");
+    //     selectData(table.find(".active").data("query"));
+    // });
 
-    $(".select-data .tabular.menu .item").tab();
+    $("#select-data .tabular.menu .item").tab();
 
     checkSourceStatus();
     // $("#div-sidebar").css("height", $(window).height() - 30);
@@ -136,7 +136,7 @@ function checkSourceStatus() {
 }
 
 function populateDataTable(headers, rows) {
-    let table = $(".select-data table");
+    let table = $("#select-data table");
     table.empty();
 
     table.append($("<thead>").append(`<tr><th>${headers.join("</th><th>")}</th></tr>`));
@@ -151,44 +151,16 @@ function populateDataTable(headers, rows) {
         tr.css("cursor", "pointer");
 
         tr.click(() => {
-            tBody.find("tr.active").removeClass("active");
-            tr.addClass("active");
+            // tBody.find("tr.active").removeClass("active");
+            // tr.addClass("active");
+            window.location.href = `/graph?source=${"RegulonDB"}&type=${"Genome"}&id=${0}`;
         })
-
-        tr.data("query", {
-            source: "RegulonDB",
-            type: "Genome",
-            name: row[0],
-            id: undefined
-        });
 
         tBody.append(tr);
     }
 
     table.append(tBody);
     table.tablesort();
-}
-
-function drawGraph(elements) {
-    graph.remove('*');
-    graph.add(elements);
-
-    graph.nodes(node => node.connectedEdges().empty()).hide();
-
-    let layout = graph.layout({
-        name: "cola",
-        animate: true,
-        refresh: 3,
-        maxSimulationTime: 2000,
-        nodeSpacing: 15
-    })
-
-    layout.one("layoutstop", () => {
-        // Rerun simulation once to achieve better results
-        layout.run();
-    });
-
-    layout.run();
 }
 
 // function selectData(data) {

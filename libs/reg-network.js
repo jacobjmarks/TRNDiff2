@@ -47,42 +47,29 @@ module.exports.getRegulatoryNetwork = (genomeId, cb) => {
     })
 }
 
-function generateCytoscapeGraph(regulatoryNetwork) {
-    let regulators = regulatoryNetwork.regulators;
+module.exports.trNetworkToGraph = (network) => {
+    let regulators = network.regulators;
     let graph = [];
 
-    let geneCounts = regulators.map(r => r.genes.length);
-    let minGeneCount = Math.min(...geneCounts);
-    let maxGeneCount = Math.max(...geneCounts);
-
-    const minNodeSize = 20;
-    const maxNodeSize = 150;
-
-    for (let queryRegulator of regulators) {
+    for (let regulator of regulators) {
         graph.push({
             group: "nodes",
             data: {
-                id: queryRegulator.vimssId,
-                name: queryRegulator.name,
-                size: minNodeSize + queryRegulator.genes.length / maxGeneCount * (maxNodeSize - minNodeSize)
+                id: regulator.name.toLowerCase(),
+                name: regulator.name,
+                size: regulator.genes.length
             }
         });
 
-        for (let queryGene of queryRegulator.genes) {
-            for (let targetRegulator of regulators) {
-                if (queryRegulator == targetRegulator) continue;
-                if (queryGene.vimssId == targetRegulator.vimssId) {
-                    graph.push({
-                        group: "edges",
-                        data: {
-                            id: `${queryGene.vimssId}_${targetRegulator.vimssId}`,
-                            source: queryRegulator.vimssId,
-                            target: targetRegulator.vimssId
-                        }
-                    });
-                    break;
+        for (let gene of regulator.genes) {
+            graph.push({
+                group: "edges",
+                data: {
+                    id: `${regulator.name.toLowerCase()}_${gene.name.toLowerCase()}`,
+                    source: regulator.name.toLowerCase(),
+                    target: gene.name.toLowerCase()
                 }
-            }
+            });
         }
     }
 
