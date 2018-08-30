@@ -36,6 +36,8 @@ function parseToTRNetwork(tsv) {
         let effect = values[2];
         let evidence = values[3];
         let strength = values[4];
+        
+        if (regulatedGene.toLowerCase() == regulatorName.toLowerCase()) continue;
 
         let rIndex = network.regulators.findIndex(r => r.name == regulatorName);
         if (rIndex == -1) {
