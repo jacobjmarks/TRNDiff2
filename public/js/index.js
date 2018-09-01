@@ -9,7 +9,19 @@ $(document).ready(() => {
                     method: "GET",
                     url: "/regprecise/genomes",
                     success: (data) => {
-                        console.log(data);
+                        populateDataTable(
+                            ["ID", "TaxID", "Name"],
+                            data.map((g) => {
+                                return {
+                                    source: "RegPrecise",
+                                    type: "Genome",
+                                    _id: g.genomeId,
+                                    "ID": g.genomeId,
+                                    "TaxID": g.taxonomyId,
+                                    "Name": g.name
+                                }
+                            })
+                        )
                     },
                     error: (e) => {
                         alert("Error retrieving RegPrecise Genomes");
@@ -22,7 +34,12 @@ $(document).ready(() => {
             case "rdb-genomes":
                 populateDataTable(
                     ["Name"],
-                    [["Escherichia coli K-12"]]
+                    [{
+                        source: "RegulonDB",
+                        type: "Genome",
+                        _id: 0,
+                        "Name": "Escherichia coli K-12"
+                    }]
                 );
                 break;
             default:
@@ -130,8 +147,10 @@ function populateDataTable(headers, rows) {
     let tBody = $("<tbody>");
     for (let row of rows) {
         let tr = $("<tr>");
-        for (let datum of row) {
-            tr.append(`<td data-sort-value="${datum}">${datum}</td>`);
+
+        for (let header of headers) {
+            let val = row[header];
+            tr.append(`<td data-sort-value="${val}">${val}</td>`);
         }
 
         tr.css("cursor", "pointer");
@@ -139,7 +158,7 @@ function populateDataTable(headers, rows) {
         tr.click(() => {
             // tBody.find("tr.active").removeClass("active");
             // tr.addClass("active");
-            window.location.href = `/graph?source=${"RegulonDB"}&type=${"Genome"}&id=${0}`;
+            window.location.href = `/graph?source=${row.source}&type=${row.type}&id=${row._id}`;
         })
 
         tBody.append(tr);

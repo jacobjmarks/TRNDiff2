@@ -3,7 +3,7 @@ const request = require("request");
 module.exports.getGenomes = (cb) => {
     request({
         method: "GET",
-        url: `http://regprecise.lbl.gov/Services/rest/genomess`,
+        url: `http://regprecise.lbl.gov/Services/rest/genomes`,
     }, (error, response, body) => {
         if (error || response.statusCode != 200) return cb(new Error(error || response.statusMessage));
         let genomes = JSON.parse(body)["genome"];
