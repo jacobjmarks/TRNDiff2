@@ -3,7 +3,7 @@ const app = express();
 const pug = require("pug");
 const fs = require("fs");
 
-const regprecise = require("./libs/regprecise.js");
+const regprecise = require("./libs/regprecise-local.js");
 const regNetwork = require("./libs/reg-network.js");
 const regulondb = require("./libs/regulondb.js");
 
