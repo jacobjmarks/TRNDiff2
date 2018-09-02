@@ -10,7 +10,7 @@ $(document).ready(() => {
                     url: "/regprecise/genomes",
                     success: (data) => {
                         populateDataTable(
-                            ["ID", "TaxID", "Name"],
+                            ["ID", "TaxID", "Name", "RNA Regulons", "RNA Sites", "TF Regulons", "TF Sites"],
                             data.map((g) => {
                                 return {
                                     source: "RegPrecise",
@@ -18,7 +18,11 @@ $(document).ready(() => {
                                     _id: g.genomeId,
                                     "ID": g.genomeId,
                                     "TaxID": g.taxonomyId,
-                                    "Name": g.name
+                                    "Name": g.name,
+                                    "RNA Regulons": g.rnaRegulonCount,
+                                    "RNA Sites": g.rnaSiteCount,
+                                    "TF Regulons": g.tfRegulonCount,
+                                    "TF Sites": g.tfSiteCount
                                 }
                             })
                         )
