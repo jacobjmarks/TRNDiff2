@@ -23,6 +23,10 @@ module.exports.getGenomes = (cb) => {
     cb(null, db.genomes);
 }
 
+module.exports.getRegulogs = (cb) => {
+    cb(null, db.regulogs);
+}
+
 module.exports.getRegulons = (genomeId, cb) => {
     cb(null, db.regulons.filter((r) => r.genomeId === genomeId));
 }

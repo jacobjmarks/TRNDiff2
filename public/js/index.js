@@ -35,6 +35,38 @@ $(document).ready(() => {
                     }
                 })
                 break;
+            case "rp-regulogs":
+                isLoading(true);
+                $.ajax({
+                    method: "GET",
+                    url: "/regprecise/regulogs",
+                    success: (data) => {
+                        populateDataTable(
+                            ["Regulog ID", "Taxonomy", "Effector", "Pathway", "Regulation Type", "Regulator Family", "Regulator Name"],
+                            data.map((r) => {
+                                return {
+                                    source: "RegPrecise",
+                                    type: "Regulog",
+                                    _id: r.regulogId,
+                                    "Regulog ID": r.regulogId,
+                                    "Taxonomy": r.taxonName,
+                                    "Effector": r.effector,
+                                    "Pathway": r.pathway,
+                                    "Regulation Type": r.regulationType,
+                                    "Regulator Family": r.regulatorFamily,
+                                    "Regulator Name": r.regulatorName
+                                }
+                            })
+                        )
+                    },
+                    error: (e) => {
+                        alert("Error retrieving RegPrecise Regulogs");
+                    },
+                    complete: () => {                    
+                        isLoading(false);
+                    }
+                })
+                break;
             case "rdb-genomes":
                 populateDataTable(
                     ["Name"],
