@@ -19,24 +19,28 @@ const db = {
     sites: parse("sites.json")
 }
 
-module.exports.getGenomes = (cb) => {
-    cb(null, db.genomes);
+module.exports.genomes = (filter, cb) => {
+    cb(null, db.genomes.filter(filter));
 }
 
-module.exports.getRegulogs = (cb) => {
-    cb(null, db.regulogs);
+module.exports.genes = (filter, cb) => {
+    cb(null, db.genes.filter(filter));
 }
 
-module.exports.getRegulons = (genomeId, cb) => {
-    cb(null, db.regulons.filter((r) => r.genomeId === genomeId));
+module.exports.regulogs = (filter, cb) => {
+    cb(null, db.regulogs.filter(filter));
 }
 
-module.exports.getGenes = (regulonId, cb) => {
-    cb(null, db.genes.filter((g) => g.regulonId === regulonId));
+module.exports.regulons = (filter, cb) => {
+    cb(null, db.regulons.filter(filter));
 }
 
-module.exports.getRegulators = (regulonId, cb) => {
-    cb(null, db.regulators.filter((r) => r.regulonId === regulonId));
+module.exports.regulators = (filter, cb) => {
+    cb(null, db.regulators.filter(filter));
+}
+
+module.exports.sites = (filter, cb) => {
+    cb(null, db.sites.filter(filter));
 }
 
 module.exports.status = (cb) => cb(null, 200);

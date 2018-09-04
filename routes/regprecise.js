@@ -12,18 +12,18 @@ router.get("/status", (req, res) => {
 });
 
 router.get("/genomes", (req, res) => {
-    regprecise.getGenomes((err, genomes) => {
+    regprecise.genomes(g => true, (err, genomes) => {
         if (err) { console.error(err); return res.status(500).end(); }
         res.json(genomes);
     });
 });
 
 router.get("/regulogs", (req, res) => {
-    regprecise.getRegulogs((err, regulogs) => {
+    regprecise.regulogs(r => true, (err, regulogs) => {
         if (err) { console.error(err); return res.status(500).end(); }
         res.json(regulogs);
-    })
-})
+    });
+});
 
 // router.get("/regulatorynetwork/:genomeId", (req, res) => {
 //     regNetwork.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
