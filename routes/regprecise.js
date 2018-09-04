@@ -30,7 +30,45 @@ router.get("/regulons", (req, res) => {
         if (err) { console.error(err); return res.status(500).end(); }
         res.json(regulons);
     });
-})
+});
+
+router.get("/genes", (req, res) => {
+    regprecise.genes(generateFilter(req.query), (err, genes) => {
+        if (err) { console.error(err); return res.status(500).end(); }
+        res.json(genes);
+    });
+});
+
+router.get("/graph/wagonwheels/regulog/:id", (req, res) => {
+    regprecise.regulons(r => r.regulogId == req.params.id, (err, regulons) => {
+        if (err) { console.error(err); return res.status(500).end(); }
+        let network = [];
+
+        for (let regulon of regulons) {
+            regprecise.genes(g => g.regulonId == regulon.regulonId, (err, genes) => {
+                if (err && !res.headersSent) { console.error(err); return res.status(500).end(); }
+
+                regulon.regulator = genes.find(g => g.name.toLowerCase() == regulon.regulatorName.toLowerCase());
+                regulon.targetGenes = [];
+                
+                for (let gene of genes.filter(g => g != regulon.regulator)) {
+                    regprecise.sites(s => s.geneVIMSSId == gene.vimssId, (err, sites) => {
+                        if (err && !res.headersSent) { console.error(err); return res.status(500).end(); }
+
+                        gene.sites = sites;
+                        regulon.targetGenes.push(gene);
+                        network.push(regulon);
+
+                        if (network.length == regulons.length) res.json(network);
+                    })
+                }
+
+                network.push(regulon);
+
+            })
+        }
+    })
+});
 
 function generateFilter(reqQuery) {
     let keys = Object.keys(reqQuery);
