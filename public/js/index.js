@@ -10,10 +10,10 @@ $(document).ready(() => {
                     url: "/regprecise/genomes",
                     success: (genomes) => {
                         populateDataTable(
-                            ["ID", "TaxID", "Name", "RNA Regulons", "RNA Sites", "TF Regulons", "TF Sites"],
+                            ["RegPrecise ID", "TaxID", "Name", "RNA Regulons", "RNA Sites", "TF Regulons", "TF Sites"],
                             genomes.map((g) => {
                                 return {
-                                    "ID": g.genomeId,
+                                    "RegPrecise ID": g.genomeId,
                                     "TaxID": g.taxonomyId,
                                     "Name": g.name,
                                     "RNA Regulons": g.rnaRegulonCount,
@@ -26,7 +26,7 @@ $(document).ready(() => {
                                 isLoading(true);
                                 $.ajax({
                                     method: "GET",
-                                    url: `/regprecise/regulons?genomeId=${$(row).data("ID")}`,
+                                    url: `/regprecise/regulons?genomeId=${$(row).data("RegPrecise ID")}`,
                                     success: (regulons) => {
                                         populateDataTable(
                                             ["Regulog ID", "Regulon ID", "Regulation Type", "Effector", "Regulator Family", "Regulator Name", "Pathway"],
@@ -34,13 +34,16 @@ $(document).ready(() => {
                                                 return {
                                                     "Regulog ID": r.regulogId,
                                                     "Regulon ID": r.regulonId,
-                                                    "Regulation Type": r.regulationType,
+                                                    "Regulation Type":  r.regulationType,
                                                     "Effector": r.effector,
                                                     "Regulator Family": r.regulatorFamily,
                                                     "Regulator Name": r.regulatorName,
                                                     "Pathway": r.pathway
                                                 }
-                                            })
+                                            }),
+                                            (row) => {
+                                                viewWagonWheels($(row).data("Regulog ID"));
+                                            }
                                         )
                                     },
                                     error: () => {
@@ -136,6 +139,7 @@ function checkSourceStatus() {
 function populateDataTable(headers, rows, onclick) {
     let table = $("#select-data table");
     table.empty();
+    table.hide();
 
     table.append($("<thead>").append(`<tr><th>${headers.join("</th><th>")}</th></tr>`));
 
@@ -157,5 +161,6 @@ function populateDataTable(headers, rows, onclick) {
     }
 
     table.append(tBody);
+    table.show();
     table.tablesort();
 }
