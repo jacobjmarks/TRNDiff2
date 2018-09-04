@@ -13,9 +13,6 @@ $(document).ready(() => {
                             ["ID", "TaxID", "Name", "RNA Regulons", "RNA Sites", "TF Regulons", "TF Sites"],
                             genomes.map((g) => {
                                 return {
-                                    source: "RegPrecise",
-                                    type: "Genome",
-                                    _id: g.genomeId,
                                     "ID": g.genomeId,
                                     "TaxID": g.taxonomyId,
                                     "Name": g.name,
@@ -25,19 +22,16 @@ $(document).ready(() => {
                                     "TF Sites": g.tfSiteCount
                                 }
                             }),
-                            (e) => {
+                            (row) => {
                                 isLoading(true);
                                 $.ajax({
                                     method: "GET",
-                                    url: `/regprecise/regulons?genomeId=${$(e.target).parent().data("ID")}`,
+                                    url: `/regprecise/regulons?genomeId=${$(row).data("ID")}`,
                                     success: (regulons) => {
                                         populateDataTable(
                                             ["Regulog ID", "Regulon ID", "Regulation Type", "Effector", "Regulator Family", "Regulator Name", "Pathway"],
                                             regulons.map((r) => {
                                                 return {
-                                                    source: "RegPrecise",
-                                                    type: "Regulon",
-                                                    _id: r.regulonId,
                                                     "Regulog ID": r.regulogId,
                                                     "Regulon ID": r.regulonId,
                                                     "Regulation Type": r.regulationType,
@@ -77,9 +71,6 @@ $(document).ready(() => {
                             ["Regulog ID", "Taxonomy", "Effector", "Pathway", "Regulation Type", "Regulator Family", "Regulator Name"],
                             data.map((r) => {
                                 return {
-                                    source: "RegPrecise",
-                                    type: "Regulog",
-                                    _id: r.regulogId,
                                     "Regulog ID": r.regulogId,
                                     "Taxonomy": r.taxonName,
                                     "Effector": r.effector,
@@ -160,7 +151,7 @@ function populateDataTable(headers, rows, onclick) {
 
         tr.css("cursor", "pointer");
 
-        tr.click(onclick);
+        tr.click((e) => { onclick($(e.target).parent()) });
 
         tBody.append(tr);
     }
