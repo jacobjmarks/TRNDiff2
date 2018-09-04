@@ -25,11 +25,4 @@ router.get("/regulogs", (req, res) => {
     });
 });
 
-// router.get("/regulatorynetwork/:genomeId", (req, res) => {
-//     regNetwork.getRegulatoryNetwork(req.params.genomeId, (err, network, graph) => {
-//         if (err) { console.error(err); return res.status(500).end(); }
-//         res.json({ network: network, graph: graph });
-//     });
-// });
-
 module.exports = router;
