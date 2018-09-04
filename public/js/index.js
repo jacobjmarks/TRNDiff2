@@ -8,10 +8,10 @@ $(document).ready(() => {
                 $.ajax({
                     method: "GET",
                     url: "/regprecise/genomes",
-                    success: (data) => {
+                    success: (genomes) => {
                         populateDataTable(
                             ["ID", "TaxID", "Name", "RNA Regulons", "RNA Sites", "TF Regulons", "TF Sites"],
-                            data.map((g) => {
+                            genomes.map((g) => {
                                 return {
                                     source: "RegPrecise",
                                     type: "Genome",
@@ -24,7 +24,39 @@ $(document).ready(() => {
                                     "TF Regulons": g.tfRegulonCount,
                                     "TF Sites": g.tfSiteCount
                                 }
-                            })
+                            }),
+                            (e) => {
+                                isLoading(true);
+                                $.ajax({
+                                    method: "GET",
+                                    url: `/regprecise/regulons?genomeId=${$(e.target).parent().data("ID")}`,
+                                    success: (regulons) => {
+                                        populateDataTable(
+                                            ["Regulog ID", "Regulon ID", "Regulation Type", "Effector", "Regulator Family", "Regulator Name", "Pathway"],
+                                            regulons.map((r) => {
+                                                return {
+                                                    source: "RegPrecise",
+                                                    type: "Regulon",
+                                                    _id: r.regulonId,
+                                                    "Regulog ID": r.regulogId,
+                                                    "Regulon ID": r.regulonId,
+                                                    "Regulation Type": r.regulationType,
+                                                    "Effector": r.effector,
+                                                    "Regulator Family": r.regulatorFamily,
+                                                    "Regulator Name": r.regulatorName,
+                                                    "Pathway": r.pathway
+                                                }
+                                            })
+                                        )
+                                    },
+                                    error: () => {
+                                        alert("Error retrieving RegPrecise Regulons");
+                                    },
+                                    complete: () => {
+                                        isLoading(false);
+                                    }
+                                })
+                            }
                         )
                     },
                     error: (e) => {
@@ -110,7 +142,7 @@ function checkSourceStatus() {
     });
 }
 
-function populateDataTable(headers, rows) {
+function populateDataTable(headers, rows, onclick) {
     let table = $("#select-data table");
     table.empty();
 
@@ -122,16 +154,13 @@ function populateDataTable(headers, rows) {
 
         for (let header of headers) {
             let val = row[header];
-            tr.append(`<td data-sort-value="${val}">${val}</td>`);
+            tr.append(`<td data-sort-value="${val}">${val}</td>`)
+                .data(header, val);
         }
 
         tr.css("cursor", "pointer");
 
-        tr.click(() => {
-            // tBody.find("tr.active").removeClass("active");
-            // tr.addClass("active");
-            window.location.href = `/graph?source=${row.source}&type=${row.type}&id=${row._id}`;
-        })
+        tr.click(onclick);
 
         tBody.append(tr);
     }

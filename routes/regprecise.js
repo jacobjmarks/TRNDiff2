@@ -26,7 +26,7 @@ router.get("/regulogs", (req, res) => {
 });
 
 router.get("/regulons", (req, res) => {
-    regprecise.regulogs(generateFilter(req.query), (err, regulons) => {
+    regprecise.regulons(generateFilter(req.query), (err, regulons) => {
         if (err) { console.error(err); return res.status(500).end(); }
         res.json(regulons);
     });
