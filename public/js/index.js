@@ -1,7 +1,7 @@
 // let selectedData = [];
 
 $(document).ready(() => {
-    $("#select-data .btn-src").click((e) => {
+    $("#select-data .secondary.menu a.item").click((e) => {
         switch($(e.target).data("source")) {
             case "rp-genomes":
                 isLoading(true);
@@ -88,7 +88,7 @@ $(document).ready(() => {
     //     selectData(table.find(".active").data("query"));
     // });
 
-    $("#select-data .tabular.menu .item").tab();
+    $("#select-data a.item").tab();
 
     checkSourceStatus();
     // $("#div-sidebar").css("height", $(window).height() - 30);

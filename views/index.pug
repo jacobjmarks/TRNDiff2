@@ -26,12 +26,26 @@ block content
             a.item(data-tab="regulondb") RegulonDB
             a.item.disabled Upload
         .ui.tab(data-tab="regprecise")
-            .ui.three.basic.buttons
-                button.ui.button.btn-src(data-source="rp-genomes") Genomes
-                button.ui.button.btn-src(data-source="rp-regulogs") Regulogs
-                button.ui.disabled.button.btn-src(data-source="rp-regulons") Regulons
+            .ui.pointing.secondary.menu
+                a.item(data-tab="rp-genomes" data-source="rp-genomes") Genomes
+                a.item(data-tab="rp-regulogs" data-source="rp-regulogs") Regulogs
+            .ui.tab(data-tab="rp-genomes")
+                .ui.breadcrumb
+                    .section Genomes
+                    i.right.angle.icon.divider
+                    .section Regulons
+                    i.right.angle.icon.divider
+                    .section Graph Regulog
+            .ui.tab(data-tab="rp-regulogs")
+                .ui.breadcrumb
+                    .section Regulog Collections
+                    i.right.angle.icon.divider
+                    .section Regulogs
+                    i.right.angle.icon.divider
+                    .section Graph Regulog
         .ui.tab(data-tab="regulondb")
-            button.ui.basic.fluid.button.btn-src(data-source="rdb-genomes") Genomes
+            .ui.pointing.secondary.menu
+                a.item(data-tab="rdb-genomes" data-source="rdb-genomes") Genomes
         .ui.tab(data-tab="upload")
 
         table.ui.single.line.compact.sortable.selectable.table
