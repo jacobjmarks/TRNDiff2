@@ -18,13 +18,15 @@ function viewWagonWheels(regulogId) {
                 .style("z-index", 10)
                 .style("visibility", "hidden")
 
-            regulonNetworks.sort((a, b) => a.targetGenes.length < b.targetGenes.length);
+            // regulonNetworks = regulonNetworks.sort((a, b) => b.targetGenes.length - a.targetGenes.length);
 
             let spokeLength = svgSize * 0.75;
-            let spokeAngle = 360 / regulonNetworks.map(r => r.targetGenes.map(tg => tg.name))                                                  
+            let spokeAngle = 360 / regulonNetworks.map(r => r.targetGenes.map(tg => tg.name))
                                                   .reduce((a, b) => a.concat(b), [])
                                                   .filter((name, index, self) => self.indexOf(name) === index)
                                                   .length;
+
+            let geneNodePositions = {};
 
             for (let regulon of regulonNetworks) {
                 let svg = graph.append("svg")
@@ -38,12 +40,16 @@ function viewWagonWheels(regulogId) {
                     y: svgSize / 2
                 }
 
-                let index = 0;
                 for (let gene of regulon.targetGenes) {
-                    let to = {
-                        x: from.x + Math.cos(toRadians((270 + spokeAngle * index) % 360)) * spokeLength/2,
-                        y: from.y + Math.sin(toRadians((270 + spokeAngle * index) % 360)) * spokeLength/2
-                    }
+                    let to = (() => {
+                        if (!geneNodePositions[gene.name]) {
+                            geneNodePositions[gene.name] = {
+                                x: from.x + Math.cos(toRadians((270 + spokeAngle * Object.keys(geneNodePositions).length) % 360)) * spokeLength/2,
+                                y: from.y + Math.sin(toRadians((270 + spokeAngle * Object.keys(geneNodePositions).length) % 360)) * spokeLength/2
+                            }
+                        }
+                        return geneNodePositions[gene.name];
+                    })()
 
                     let spoke = svg.append("line")
                         .attr("x1", from.x)
@@ -80,8 +86,6 @@ function viewWagonWheels(regulogId) {
                                     }
                                 })
                         })
-
-                    index++;
                 }
 
                 let centroidMargin = svg.append("circle")
