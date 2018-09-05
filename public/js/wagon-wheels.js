@@ -44,6 +44,7 @@ function drawWagonWheels(regulonNetworks) {
                                           .reduce((a, b) => a.concat(b), [])
                                           .filter((name, index, self) => self.indexOf(name) === index)
                                           .length;
+    let geneNodeRadius = Math.min(svgSize * 0.05, 10);
 
     let geneNodePositions = {};
 
@@ -85,7 +86,7 @@ function drawWagonWheels(regulonNetworks) {
                 .attr("class", "gene-node")
                 .attr("cx", to.x)
                 .attr("cy", to.y)
-                .attr("r", 10)
+                .attr("r", geneNodeRadius)
                 .attr("fill", "#8dd3c7")
                 .on("mouseover", () => {
                     d3.selectAll("svg")
@@ -111,14 +112,14 @@ function drawWagonWheels(regulonNetworks) {
             .attr("class", "centroid-margin")
             .attr("cx", svgSize / 2)
             .attr("cy", svgSize / 2)
-            .attr("r", 15)
+            .attr("r", geneNodeRadius * 1.5)
             .attr("fill", "white")
         
         let centroid = svg.append("circle")
             .attr("class", "centroid")
             .attr("cx", svgSize / 2)
             .attr("cy", svgSize / 2)
-            .attr("r", 10)
+            .attr("r", geneNodeRadius)
             .on("mouseout", () => { tooltip.style("visibility", "hidden") })
             .on("mousemove", () => { tooltip.style("top",(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px") })
             .on("mouseover", () => {
