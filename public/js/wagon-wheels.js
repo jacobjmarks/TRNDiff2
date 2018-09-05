@@ -18,13 +18,18 @@ function viewWagonWheels(regulogId) {
                 .style("z-index", 10)
                 .style("visibility", "hidden")
 
+            regulonNetworks.sort((a, b) => a.targetGenes.length < b.targetGenes.length);
+
+            let spokeLength = svgSize * 0.75;
+            let spokeAngle = 360 / regulonNetworks.map(r => r.targetGenes.map(tg => tg.name))                                                  
+                                                  .reduce((a, b) => a.concat(b), [])
+                                                  .filter((name, index, self) => self.indexOf(name) === index)
+                                                  .length;
+
             for (let regulon of regulonNetworks) {
                 let svg = graph.append("svg")
                     .attr("width", svgSize)
                     .attr("height", svgSize)
-
-                let spokeLength = svgSize * 0.75;
-                let spokeAngle = 360 / regulon.targetGenes.length;
 
                 let toRadians = (degrees) => degrees / 180 * Math.PI;
 
