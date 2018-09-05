@@ -22,18 +22,6 @@ function viewWagonWheels(regulogId) {
                 let svg = graph.append("svg")
                     .attr("width", svgSize)
                     .attr("height", svgSize)
-                
-                let centroid = svg.append("circle")
-                    .attr("cx", svgSize / 2)
-                    .attr("cy", svgSize / 2)
-                    .attr("r", 10)
-                    .on("mouseout", () => { tooltip.style("visibility", "hidden") })
-                    .on("mousemove", () => { tooltip.style("top",(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px") })
-                    .on("mouseover", () => {
-                        tooltip
-                            .text(regulon.regulatorName)
-                            .style("visibility", "visible")
-                    })
 
                 let spokeLength = svgSize * 0.75;
                 let spokeAngle = 360 / regulon.targetGenes.length;
@@ -41,8 +29,8 @@ function viewWagonWheels(regulogId) {
                 let toRadians = (degrees) => degrees / 180 * Math.PI;
 
                 let from = {
-                    x: Number(centroid.attr("cx")),
-                    y: Number(centroid.attr("cy"))
+                    x: svgSize / 2,
+                    y: svgSize / 2
                 }
 
                 let index = 0;
@@ -67,6 +55,24 @@ function viewWagonWheels(regulogId) {
 
                     index++;
                 }
+
+                let centroidMargin = svg.append("circle")
+                    .attr("cx", svgSize / 2)
+                    .attr("cy", svgSize / 2)
+                    .attr("r", 15)
+                    .attr("fill", "white")
+                
+                let centroid = svg.append("circle")
+                    .attr("cx", svgSize / 2)
+                    .attr("cy", svgSize / 2)
+                    .attr("r", 10)
+                    .on("mouseout", () => { tooltip.style("visibility", "hidden") })
+                    .on("mousemove", () => { tooltip.style("top",(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px") })
+                    .on("mouseover", () => {
+                        tooltip
+                            .text(regulon.regulatorName)
+                            .style("visibility", "visible")
+                    })
             }
         },
         error: () => {
