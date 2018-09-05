@@ -1,5 +1,12 @@
 let columns = 4;
 
+$(document).ready(() => {
+    tooltip = d3.select("body").append("tooltip")
+        .style("position", "absolute")
+        .style("z-index", 10)
+        .style("visibility", "hidden")
+})
+
 function viewWagonWheels(regulogId) {
     $("#select-data .table").empty();
     $("#select-data .table").hide();
@@ -24,13 +31,9 @@ function viewWagonWheels(regulogId) {
 }
 
 function drawWagonWheels(regulonNetworks) {
-    let graph = d3.select("#graph"); graph.html("");
-    let svgSize = $(".ui.container").width() / columns;
-
-    let tooltip = d3.select("body").append("div")
-        .style("position", "absolute")
-        .style("z-index", 10)
-        .style("visibility", "hidden")
+    let graph = d3.select("#graph");
+    graph.html("");
+    let svgSize = $("#graph").parent().width() / columns;
 
     // regulonNetworks = regulonNetworks.sort((a, b) => b.targetGenes.length - a.targetGenes.length);
 
