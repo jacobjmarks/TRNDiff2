@@ -24,7 +24,7 @@ function viewWagonWheels(regulogId) {
 
             $(window).resize(() => { if ($("#graph #body").html()) drawWagonWheels(regulonNetworks) })
             $("#btn-zoom-out").unbind().click(() => { columns++; drawWagonWheels(regulonNetworks) })
-            $("#btn-zoom-in").unbind().click(() => { if (columns > 1) columns--; drawWagonWheels(regulonNetworks) })
+            $("#btn-zoom-in").unbind().click(() => { if (columns > 1) { columns--; drawWagonWheels(regulonNetworks) } })
         },
         error: () => {
             alert("Error fetching graph network");
@@ -37,9 +37,7 @@ function viewWagonWheels(regulogId) {
 
 function drawWagonWheels(regulonNetworks) {
     $("#graph").show();
-    let graph = d3.select("#graph #body");
-    graph.html("");
-    let svgSize = $("#graph").parent().width() / columns;
+    let svgSize = $("#graph").width() / columns;
 
     // regulonNetworks = regulonNetworks.sort((a, b) => b.targetGenes.length - a.targetGenes.length);
 
@@ -51,6 +49,9 @@ function drawWagonWheels(regulonNetworks) {
     let geneNodeRadius = Math.min(svgSize * 0.05, 10);
 
     let geneNodePositions = {};
+
+    let graph = d3.select("#graph #body");
+    graph.html("");
 
     for (let regulon of regulonNetworks) {
         let svg = graph.append("svg")
@@ -165,5 +166,11 @@ function drawWagonWheels(regulonNetworks) {
                     )
                     .css("visibility", "visible")
             })
+    }
+
+    // Redraw if available width has changed after drawing
+    // (usually due to scrollbar popin)
+    if ($("#graph").width() < svgSize * columns) {
+        drawWagonWheels(regulonNetworks);
     }
 }
