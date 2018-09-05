@@ -79,7 +79,7 @@ function drawWagonWheels(regulonNetworks) {
                 .attr("stroke-width", 2)
                 .attr("stroke", "#8dd3c7")
             
-            if (!gene.sites.length) spoke.style("stroke-dasharray", "5, 5")
+            if (!gene.sites.length) spoke.style("stroke-dasharray", "5, 5").style("opacity", 0.5);
 
             let node = svg.append("circle")
                 .datum(gene)
@@ -93,7 +93,14 @@ function drawWagonWheels(regulonNetworks) {
                         .selectAll("circle.gene-node")
                         .each(function (d, i) {
                             if (d.name == gene.name) {
-                                d3.select(this).attr("fill", "blue");
+                                let circle = d3.select(this);
+                                circle.attr("fill", "blue");
+                                d3.selectAll("svg").selectAll("line").each(function(d, i) {
+                                    let line = d3.select(this);
+                                    if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
+                                        line.style("stroke", "blue");
+                                    }
+                                })
                             }
                         })
                 })
@@ -102,7 +109,14 @@ function drawWagonWheels(regulonNetworks) {
                         .selectAll("circle.gene-node")
                         .each(function (d, i) {
                             if (d.name == gene.name) {
-                                d3.select(this).attr("fill", "#8dd3c7");
+                                let circle = d3.select(this);
+                                circle.attr("fill", "#8dd3c7");
+                                d3.selectAll("svg").selectAll("line").each(function(d, i) {
+                                    let line = d3.select(this);
+                                    if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
+                                        line.style("stroke", "#8dd3c7");
+                                    }
+                                })
                             }
                         })
                 })
