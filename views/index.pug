@@ -9,7 +9,11 @@ block scripts
     link(rel="stylesheet" href="./css/index.css")
 
 block content
-    .ui.huge.header TRNetwork
+    .ui.huge.header
+        a.ui.huge.image(href="http://qut.edu.au/" target="_blank")
+            img(src="./img/qut-logo.jpg")
+        .content TRNDiff Regulon Explorer
+            .sub.header Hello World
 
     #selected-data(style="display:none")
         .ui.header Selected Data
@@ -22,7 +26,6 @@ block content
             tbody
 
     #select-data
-        .ui.header Select Regulator Source
         .ui.tabular.menu
             a.item(data-tab="regprecise")
                 i.small.loading.circle.notch.icon
