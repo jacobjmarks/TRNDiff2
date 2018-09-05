@@ -35,28 +35,28 @@ function viewWagonWheels(regulogId) {
                             .style("visibility", "visible")
                     })
 
-                let spokeRadius = svgSize * 0.75 / 2;
-                let spokeAngle = 360 / regulon.targetGenes.length * 0.01745329252;
+                let spokeLength = svgSize * 0.75;
+                let spokeAngle = 360 / regulon.targetGenes.length;
 
-                let origin = {
-                    x: centroid.attr("cx"),
-                    y: centroid.attr("cy")
+                let toRadians = (degrees) => degrees / 180 * Math.PI;
+
+                let from = {
+                    x: Number(centroid.attr("cx")),
+                    y: Number(centroid.attr("cy"))
                 }
 
                 let index = 0;
                 for (let gene of regulon.targetGenes) {
-                    spokeAngle = index / (regulon.targetGenes.length / 2) * Math.PI;
-
-                    let x1 = origin.x;
-                    let y1 = origin.y;
-                    let x2 = spokeRadius * Math.cos(spokeAngle) + svgSize / 2;
-                    let y2 = spokeRadius * Math.sin(spokeAngle) + svgSize / 2;
+                    let to = {
+                        x: from.x + Math.cos(toRadians((270 + spokeAngle * index) % 360)) * spokeLength/2,
+                        y: from.y + Math.sin(toRadians((270 + spokeAngle * index) % 360)) * spokeLength/2
+                    }
 
                     let spoke = svg.append("line")
-                        .attr("x1", x1)
-                        .attr("y1", y1)
-                        .attr("x2", x2)
-                        .attr("y2", y2)
+                        .attr("x1", from.x)
+                        .attr("y1", from.y)
+                        .attr("x2", to.x)
+                        .attr("y2", to.y)
                         .attr("stroke-width", 2)
                         .attr("stroke", "black")
 
