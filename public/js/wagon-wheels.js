@@ -8,7 +8,7 @@ function viewWagonWheels(regulogId) {
     isLoading(true);
     $.ajax({
         method: "GET",
-        url: `/regprecise/graph/wagonwheels/regulog/${regulogId}`,
+        url: `/regprecise/regulognetwork/${regulogId}`,
         success: (regulonNetworks) => {
             let graph = d3.select("#graph");
             let svgSize = $(".ui.container").width() / columns;

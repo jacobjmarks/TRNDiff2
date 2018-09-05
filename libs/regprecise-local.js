@@ -44,3 +44,20 @@ module.exports.sites = (filter, cb) => {
 }
 
 module.exports.status = (cb) => cb(null, 200);
+
+module.exports.getRegulogNetwork = (regulogId, cb) => {
+    let network = db.regulons.filter(r => r.regulogId == regulogId);
+
+    for (let regulon of network) {
+        let genes = db.genes.filter(g => g.regulonId == regulon.regulonId);
+
+        regulon.regulator = genes.find(g => g.name && g.name.toLowerCase() == regulon.regulatorName.toLowerCase())
+        regulon.targetGenes = genes.filter(g => g != regulon.regulator);
+
+        for (let gene of regulon.targetGenes) {
+            gene.sites = db.sites.filter(s => s.geneVIMSSId == gene.vimssId);
+        }
+    }
+
+    cb(null, network);
+}
