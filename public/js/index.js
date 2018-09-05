@@ -158,8 +158,6 @@ function populateDataTable(headers, rows, onclick) {
                 .data(header, val);
         }
 
-        tr.css("cursor", "pointer");
-
         tr.click((e) => { onclick($(e.target).parent()) });
 
         tBody.append(tr);

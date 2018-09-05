@@ -1,0 +1,7 @@
+body {
+    padding: 15px;
+}
+
+#select-data table tr {
+    cursor: pointer;
+}
