@@ -82,7 +82,10 @@ $(document).ready(() => {
                                     "Regulator Family": r.regulatorFamily,
                                     "Regulator Name": r.regulatorName
                                 }
-                            })
+                            }),
+                            (row) => {
+                                viewWagonWheels($(row).data("Regulog ID"));
+                            }
                         )
                     },
                     error: (e) => {
