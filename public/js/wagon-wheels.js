@@ -46,12 +46,14 @@ function viewWagonWheels(regulogId) {
                         .attr("x2", to.x)
                         .attr("y2", to.y)
                         .attr("stroke-width", 2)
-                        .attr("stroke", "black")
+                        .attr("stroke", "#8dd3c7")
+                        .style("stroke-dasharray", gene.sites.length ? "0, 0" : "5, 5")
 
                     let node = svg.append("circle")
                         .attr("cx", to.x)
                         .attr("cy", to.y)
                         .attr("r", 10)
+                        .attr("fill", "#8dd3c7")
 
                     index++;
                 }
