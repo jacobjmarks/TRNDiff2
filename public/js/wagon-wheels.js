@@ -47,24 +47,47 @@ function viewWagonWheels(regulogId) {
                         .attr("y2", to.y)
                         .attr("stroke-width", 2)
                         .attr("stroke", "#8dd3c7")
-                        .style("stroke-dasharray", gene.sites.length ? "0, 0" : "5, 5")
+                    
+                    if (!gene.sites.length) spoke.style("stroke-dasharray", "5, 5")
 
                     let node = svg.append("circle")
+                        .datum(gene)
+                        .attr("class", "gene-node")
                         .attr("cx", to.x)
                         .attr("cy", to.y)
                         .attr("r", 10)
                         .attr("fill", "#8dd3c7")
+                        .on("mouseover", () => {
+                            d3.selectAll("svg")
+                                .selectAll("circle.gene-node")
+                                .each(function (d, i) {
+                                    if (d.name == gene.name) {
+                                        d3.select(this).attr("fill", "blue");
+                                    }
+                                })
+                        })
+                        .on("mouseout", () => {
+                            d3.selectAll("svg")
+                                .selectAll("circle.gene-node")
+                                .each(function (d, i) {
+                                    if (d.name == gene.name) {
+                                        d3.select(this).attr("fill", "#8dd3c7");
+                                    }
+                                })
+                        })
 
                     index++;
                 }
 
                 let centroidMargin = svg.append("circle")
+                    .attr("class", "centroid-margin")
                     .attr("cx", svgSize / 2)
                     .attr("cy", svgSize / 2)
                     .attr("r", 15)
                     .attr("fill", "white")
                 
                 let centroid = svg.append("circle")
+                    .attr("class", "centroid")
                     .attr("cx", svgSize / 2)
                     .attr("cy", svgSize / 2)
                     .attr("r", 10)
