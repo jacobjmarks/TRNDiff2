@@ -55,4 +55,11 @@ block content
 
         table.ui.single.line.compact.sortable.selectable.table(style="display:none")
 
-    #graph
+    #graph(style="display:none")
+        #header
+            .ui.large.basic.right.floated.icon.buttons
+                .ui.button#btn-zoom-out
+                    i.zoom-out.icon
+                .ui.button#btn-zoom-in
+                    i.zoom-in.icon
+        #body(style="clear:both")

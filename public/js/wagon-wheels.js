@@ -10,7 +10,6 @@ $(document).ready(() => {
 function viewWagonWheels(regulogId) {
     $("#select-data .table").empty();
     $("#select-data .table").hide();
-    $("#graph").empty();
 
     isLoading(true);
     $.ajax({
@@ -19,7 +18,9 @@ function viewWagonWheels(regulogId) {
         success: (regulonNetworks) => {
             drawWagonWheels(regulonNetworks);
 
-            $(window).resize(() => { if ($("#graph").html()) drawWagonWheels(regulonNetworks) })
+            $(window).resize(() => { if ($("#graph #body").html()) drawWagonWheels(regulonNetworks) })
+            $("#btn-zoom-out").click(() => { columns++; drawWagonWheels(regulonNetworks) })
+            $("#btn-zoom-in").click(() => { columns--; drawWagonWheels(regulonNetworks) })
         },
         error: () => {
             alert("Error fetching graph network");
@@ -31,9 +32,10 @@ function viewWagonWheels(regulogId) {
 }
 
 function drawWagonWheels(regulonNetworks) {
-    let graph = d3.select("#graph");
+    $("#graph").show();
+    let graph = d3.select("#graph #body");
     graph.html("");
-    let svgSize = $("#graph").parent().width() / columns;
+    let svgSize = $("#graph #body").parent().width() / columns;
 
     // regulonNetworks = regulonNetworks.sort((a, b) => b.targetGenes.length - a.targetGenes.length);
 
