@@ -140,6 +140,7 @@ function checkSourceStatus() {
 }
 
 function populateDataTable(headers, rows, onclick) {
+    $("#graph").empty();
     let table = $("#select-data table");
     table.empty();
     table.hide();
