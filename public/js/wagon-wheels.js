@@ -1,10 +1,14 @@
 let columns = 4;
 
 $(document).ready(() => {
-    tooltip = d3.select("body").append("tooltip")
-        .style("position", "absolute")
-        .style("z-index", 10)
-        .style("visibility", "hidden")
+    tooltip = $("<tooltip>")
+        .addClass("ui segment")
+        .css("position", "absolute")
+        .css("z-index", 10)
+        .css("visibility", "hidden")
+        .css("padding", "10px")
+        .css("background-color", "rgba(255,255,255,0.75)")
+    $("body").append(tooltip);
 })
 
 function viewWagonWheels(regulogId) {
@@ -134,12 +138,32 @@ function drawWagonWheels(regulonNetworks) {
             .attr("cx", svgSize / 2)
             .attr("cy", svgSize / 2)
             .attr("r", geneNodeRadius)
-            .on("mouseout", () => { tooltip.style("visibility", "hidden") })
-            .on("mousemove", () => { tooltip.style("top",(d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px") })
+            .on("mouseout", () => { tooltip.css("visibility", "hidden") })
+            .on("mousemove", () => { tooltip.css("top",(d3.event.pageY-10)+"px").css("left",(d3.event.pageX+10)+"px") })
             .on("mouseover", () => {
+                tooltip.empty();
                 tooltip
-                    .text(regulon.regulatorName)
-                    .style("visibility", "visible")
+                    .append($("<table>")
+                        .append($("<tr>")
+                            .append($("<td>").text("Locus Tag"))
+                            .append($("<td>").text(regulon.regulator && regulon.regulator.locusTag || "n/a")))
+                        .append($("<tr>")
+                            .append($("<td>").text("Regulator Family"))
+                            .append($("<td>").text(regulon.regulatorFamily)))
+                        .append($("<tr>")
+                            .append($("<td>").text("Regulator Name"))
+                            .append($("<td>").text(regulon.regulatorName)))
+                        .append($("<tr>")
+                            .append($("<td>").text("Regulation Type"))
+                            .append($("<td>").text(regulon.regulationType)))
+                        .append($("<tr>")
+                            .append($("<td>").text("Function"))
+                            .append($("<td>").text(regulon.regulator && regulon.regulator.function || "n/a")))
+                        .append($("<tr>")
+                            .append($("<td>").text("Target Genes"))
+                            .append($("<td>").text(regulon.targetGenes.length)))
+                    )
+                    .css("visibility", "visible")
             })
     }
 }
