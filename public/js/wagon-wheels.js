@@ -60,6 +60,11 @@ function viewWagonWheels(regulogId) {
                         .attr("stroke-width", 2)
                         .attr("stroke", "black")
 
+                    let node = svg.append("circle")
+                        .attr("cx", to.x)
+                        .attr("cy", to.y)
+                        .attr("r", 10)
+
                     index++;
                 }
             }
