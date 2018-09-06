@@ -71,7 +71,7 @@ function drawWagonWheels(regulonNetworks) {
         svgDiv.append(svg);
 
         let svgFooter = $("<div>")
-                .addClass("header")
+                .addClass("ui centered small header")
                 .text(regulon.genomeName)
         svgDiv.append(svgFooter);
 

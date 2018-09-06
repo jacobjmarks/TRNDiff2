@@ -9,3 +9,9 @@ body {
 #graph #body {
     justify-content: center;
 }
+
+.wagonwheel .header {
+    margin: 0px;
+    padding: 5px;
+    padding-top: 0px;
+}
