@@ -6,8 +6,8 @@ $(document).ready(() => {
 
 function isLoading(loading) {
     if (loading) {
-        $(".dimmer").dimmer("show");
+        $("#page-dimmer").dimmer("show");
     } else {
-        $(".dimmer").dimmer("hide");
+        $("#page-dimmer").dimmer("hide");
     }
 }
