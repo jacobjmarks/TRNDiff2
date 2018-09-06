@@ -86,6 +86,23 @@ function drawWagonWheels(regulonNetworks) {
             
             if (!gene.sites.length) spoke.style("stroke-dasharray", "5, 5").style("opacity", 0.5);
 
+            function highlighNodeAndSpoke(color) {
+                d3.selectAll("svg")
+                    .selectAll("circle.gene-node")
+                    .each(function (d, i) {
+                        if (d.name == gene.name) {
+                            let circle = d3.select(this);
+                            circle.attr("fill", color);
+                            d3.selectAll("svg").selectAll("line").each(function(d, i) {
+                                let line = d3.select(this);
+                                if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
+                                    line.style("stroke", color);
+                                }
+                            })
+                        }
+                    })
+            }
+
             let node = svg.append("circle")
                 .datum(gene)
                 .attr("class", "gene-node")
@@ -94,36 +111,36 @@ function drawWagonWheels(regulonNetworks) {
                 .attr("r", geneNodeRadius)
                 .attr("fill", "#8dd3c7")
                 .on("mouseover", () => {
-                    d3.selectAll("svg")
-                        .selectAll("circle.gene-node")
-                        .each(function (d, i) {
-                            if (d.name == gene.name) {
-                                let circle = d3.select(this);
-                                circle.attr("fill", "blue");
-                                d3.selectAll("svg").selectAll("line").each(function(d, i) {
-                                    let line = d3.select(this);
-                                    if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
-                                        line.style("stroke", "blue");
-                                    }
-                                })
-                            }
-                        })
+                    highlighNodeAndSpoke("blue");
+
+                    tooltip.empty();
+                    tooltip
+                        .append($("<table>")
+                            .append($("<tr>")
+                                .append($("<td>").text("Locus Tag"))
+                                .append($("<td>").text(gene.locusTag || "n/a")))
+                            .append($("<tr>")
+                                .append($("<td>").text("Gene Name"))
+                                .append($("<td>").text(gene.name)))
+                            .append($("<tr>")
+                                .append($("<td>").text("Function"))
+                                .append($("<td>").text(gene.function || "n/a")))
+                            .append($("<tr>")
+                                .append($("<td>").text("Site/s"))
+                                .append($("<td>").text(gene.sites.map(s => s.sequence).join(", ") || "n/a")))
+                            .append(!gene.sites.length ? null : $("<tr>")
+                                .append($("<td>").text("Site Position"))
+                                .append($("<td>").text(gene.sites.map(s => s.position).join(", ") || "n/a")))
+                            .append(!gene.sites.length ? null : $("<tr>")
+                                .append($("<td>").text("Site Score"))
+                                .append($("<td>").text(gene.sites.map(s => s.score).join(", ") || "n/a")))
+                        )
+                    tooltip.css("visibility", "visible")
                 })
+                .on("mousemove", () => { tooltip.css("top",(d3.event.pageY-10)+"px").css("left",(d3.event.pageX+10)+"px") })
                 .on("mouseout", () => {
-                    d3.selectAll("svg")
-                        .selectAll("circle.gene-node")
-                        .each(function (d, i) {
-                            if (d.name == gene.name) {
-                                let circle = d3.select(this);
-                                circle.attr("fill", "#8dd3c7");
-                                d3.selectAll("svg").selectAll("line").each(function(d, i) {
-                                    let line = d3.select(this);
-                                    if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
-                                        line.style("stroke", "#8dd3c7");
-                                    }
-                                })
-                            }
-                        })
+                    highlighNodeAndSpoke("#8dd3c7");
+                    tooltip.css("visibility", "hidden");
                 })
         }
 
@@ -139,8 +156,6 @@ function drawWagonWheels(regulonNetworks) {
             .attr("cx", svgSize / 2)
             .attr("cy", svgSize / 2)
             .attr("r", geneNodeRadius)
-            .on("mouseout", () => { tooltip.css("visibility", "hidden") })
-            .on("mousemove", () => { tooltip.css("top",(d3.event.pageY-10)+"px").css("left",(d3.event.pageX+10)+"px") })
             .on("mouseover", () => {
                 tooltip.empty();
                 tooltip
@@ -166,6 +181,8 @@ function drawWagonWheels(regulonNetworks) {
                     )
                     .css("visibility", "visible")
             })
+            .on("mousemove", () => { tooltip.css("top",(d3.event.pageY-10)+"px").css("left",(d3.event.pageX+10)+"px") })
+            .on("mouseout", () => { tooltip.css("visibility", "hidden") })
     }
 
     // Redraw if available width has changed after drawing
