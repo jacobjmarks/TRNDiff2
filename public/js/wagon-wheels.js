@@ -40,7 +40,9 @@ function svgElem(tag) {
 
 function drawWagonWheels(regulonNetworks) {
     $("#graph").show();
-    let svgSize = $("#graph").width() / columns;
+    const svgDivMargin = 14;
+    let svgDivSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
+    let svgSize = svgDivSize;
 
     // regulonNetworks = regulonNetworks.sort((a, b) => b.targetGenes.length - a.targetGenes.length);
 
@@ -57,11 +59,21 @@ function drawWagonWheels(regulonNetworks) {
     graph.empty();
 
     for (let regulon of regulonNetworks) {
+        let svgDiv = $("<div>")
+            .addClass("wagonwheel ui card")
+            .width(svgDivSize)
+
         let svg = $(svgElem("svg"))
             .attr({
                 "width": svgSize,
                 "height": svgSize
             })
+        svgDiv.append(svg);
+
+        let svgFooter = $("<div>")
+                .addClass("header")
+                .text(regulon.genomeName)
+        svgDiv.append(svgFooter);
 
         let toRadians = (degrees) => degrees / 180 * Math.PI;
 
@@ -198,12 +210,12 @@ function drawWagonWheels(regulonNetworks) {
             .on("mouseout", () => { tooltip.css("visibility", "hidden") })
         svg.append(centroid);
 
-        graph.append(svg);
+        graph.append(svgDiv);
     }
 
     // Redraw if available width has changed after drawing
     // (usually due to scrollbar popin)
-    if ($("#graph").width() < svgSize * columns) {
+    if ($("#graph").width() < (svgDivSize + svgDivMargin) * columns) {
         drawWagonWheels(regulonNetworks);
     }
 }

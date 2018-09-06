@@ -5,3 +5,7 @@ body {
 #select-data table tr {
     cursor: pointer;
 }
+
+#graph #body {
+    justify-content: center;
+}
