@@ -1,5 +1,3 @@
-// let selectedData = [];
-
 $(document).ready(() => {
     $("#select-data .secondary.menu a.item").click((e) => {
         switch($(e.target).data("source")) {
