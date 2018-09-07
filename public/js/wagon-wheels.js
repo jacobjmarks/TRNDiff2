@@ -1,14 +1,13 @@
 let columns = 4;
 
 $(document).ready(() => {
-    tooltip = $("<tooltip>")
+    $("body").append(tooltip = $("<tooltip>")
         .addClass("ui segment")
         .css("position", "absolute")
         .css("z-index", 10)
         .css("visibility", "hidden")
         .css("padding", "10px")
-        .css("background-color", "rgba(255,255,255,0.75)")
-    $("body").append(tooltip);
+        .css("background-color", "rgba(255,255,255,0.75)"))
 })
 
 function viewWagonWheels(regulogId) {
@@ -59,8 +58,10 @@ function drawWagonWheels(regulonNetworks) {
 
     for (let regulon of regulonNetworks) {
         let svg = $(svgElem("svg"))
-            .attr("width", svgSize)
-            .attr("height", svgSize)
+            .attr({
+                "width": svgSize,
+                "height": svgSize
+            })
 
         let toRadians = (degrees) => degrees / 180 * Math.PI;
 
@@ -81,12 +82,14 @@ function drawWagonWheels(regulonNetworks) {
             })()
 
             let spoke = $(svgElem("line"))
-                .attr("x1", from.x)
-                .attr("y1", from.y)
-                .attr("x2", to.x)
-                .attr("y2", to.y)
-                .attr("stroke-width", 2)
-                .attr("stroke", "#8dd3c7")
+                .attr({
+                    "x1": from.x,
+                    "y1": from.y,
+                    "x2": to.x,
+                    "y2": to.y,
+                    "stroke-width": 2,
+                    "stroke": "#8dd3c7"
+                })
             svg.append(spoke);
             
             if (!gene.sites.length) spoke.css("stroke-dasharray", "5, 5").css("opacity", 0.5);
@@ -107,12 +110,14 @@ function drawWagonWheels(regulonNetworks) {
             }
 
             let node = $(svgElem("circle"))
-                .data("gene-data", gene)
                 .addClass("gene-node")
-                .attr("cx", to.x)
-                .attr("cy", to.y)
-                .attr("r", geneNodeRadius)
-                .attr("fill", "#8dd3c7")
+                .data("gene-data", gene)
+                .attr({
+                    "cx": to.x,
+                    "cy": to.y,
+                    "r": geneNodeRadius,
+                    "fill": "#8dd3c7"
+                })
                 .on("mouseover", () => {
                     highlighNodeAndSpoke("blue");
 
@@ -148,18 +153,22 @@ function drawWagonWheels(regulonNetworks) {
         }
 
         let centroidMargin = $(svgElem("circle"))
-            .attr("class", "centroid-margin")
-            .attr("cx", svgSize / 2)
-            .attr("cy", svgSize / 2)
-            .attr("r", geneNodeRadius * 1.5)
-            .attr("fill", "white")
+            .addClass("centroid-margin")
+            .attr({
+                "cx": svgSize / 2,
+                "cy": svgSize / 2,
+                "r": geneNodeRadius * 1.5,
+                "fill": "white"
+            })
         svg.append(centroidMargin);
         
         let centroid = $(svgElem("circle"))
-            .attr("class", "centroid")
-            .attr("cx", svgSize / 2)
-            .attr("cy", svgSize / 2)
-            .attr("r", geneNodeRadius)
+            .addClass("centroid")
+            .attr({
+                "cx": svgSize / 2,
+                "cy": svgSize / 2,
+                "r": geneNodeRadius
+            })
             .on("mouseover", () => {
                 tooltip.empty();
                 tooltip
