@@ -35,6 +35,10 @@ function viewWagonWheels(regulogId) {
     })
 }
 
+function svgElem(tag) {
+    return document.createElementNS("http://www.w3.org/2000/svg", tag);
+}
+
 function drawWagonWheels(regulonNetworks) {
     $("#graph").show();
     let svgSize = $("#graph").width() / columns;
@@ -50,11 +54,11 @@ function drawWagonWheels(regulonNetworks) {
 
     let geneNodePositions = {};
 
-    let graph = d3.select("#graph #body");
-    graph.html("");
+    let graph = $("#graph #body");
+    graph.empty();
 
     for (let regulon of regulonNetworks) {
-        let svg = graph.append("svg")
+        let svg = $(svgElem("svg"))
             .attr("width", svgSize)
             .attr("height", svgSize)
 
@@ -76,36 +80,35 @@ function drawWagonWheels(regulonNetworks) {
                 return geneNodePositions[gene.name];
             })()
 
-            let spoke = svg.append("line")
+            let spoke = $(svgElem("line"))
                 .attr("x1", from.x)
                 .attr("y1", from.y)
                 .attr("x2", to.x)
                 .attr("y2", to.y)
                 .attr("stroke-width", 2)
                 .attr("stroke", "#8dd3c7")
+            svg.append(spoke);
             
-            if (!gene.sites.length) spoke.style("stroke-dasharray", "5, 5").style("opacity", 0.5);
+            if (!gene.sites.length) spoke.css("stroke-dasharray", "5, 5").css("opacity", 0.5);
 
             function highlighNodeAndSpoke(color) {
-                d3.selectAll("svg")
-                    .selectAll("circle.gene-node")
-                    .each(function (d, i) {
-                        if (d.name == gene.name) {
-                            let circle = d3.select(this);
-                            circle.attr("fill", color);
-                            d3.selectAll("svg").selectAll("line").each(function(d, i) {
-                                let line = d3.select(this);
-                                if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
-                                    line.style("stroke", color);
-                                }
-                            })
-                        }
-                    })
+                $("svg").find("circle.gene-node").each(function () {
+                    let circle = $(this);
+                    if (circle.data("gene-data").name == gene.name) {
+                        circle.attr("fill", color);
+                        $("svg").find("line").each(function () {
+                            let line = $(this);
+                            if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
+                                line.css("stroke", color);
+                            }
+                        })
+                    }
+                })
             }
 
-            let node = svg.append("circle")
-                .datum(gene)
-                .attr("class", "gene-node")
+            let node = $(svgElem("circle"))
+                .data("gene-data", gene)
+                .addClass("gene-node")
                 .attr("cx", to.x)
                 .attr("cy", to.y)
                 .attr("r", geneNodeRadius)
@@ -114,44 +117,45 @@ function drawWagonWheels(regulonNetworks) {
                     highlighNodeAndSpoke("blue");
 
                     tooltip.empty();
-                    tooltip
-                        .append($("<table>")
-                            .append($("<tr>")
-                                .append($("<td>").text("Locus Tag"))
-                                .append($("<td>").text(gene.locusTag || "n/a")))
-                            .append($("<tr>")
-                                .append($("<td>").text("Gene Name"))
-                                .append($("<td>").text(gene.name)))
-                            .append($("<tr>")
-                                .append($("<td>").text("Function"))
-                                .append($("<td>").text(gene.function || "n/a")))
-                            .append($("<tr>")
-                                .append($("<td>").text("Site/s"))
-                                .append($("<td>").text(gene.sites.map(s => s.sequence).join(", ") || "n/a")))
-                            .append(!gene.sites.length ? null : $("<tr>")
-                                .append($("<td>").text("Site Position"))
-                                .append($("<td>").text(gene.sites.map(s => s.position).join(", ") || "n/a")))
-                            .append(!gene.sites.length ? null : $("<tr>")
-                                .append($("<td>").text("Site Score"))
-                                .append($("<td>").text(gene.sites.map(s => s.score).join(", ") || "n/a")))
-                        )
+                    tooltip.append($("<table>")
+                        .append($("<tr>")
+                            .append($("<td>").text("Locus Tag"))
+                            .append($("<td>").text(gene.locusTag || "n/a")))
+                        .append($("<tr>")
+                            .append($("<td>").text("Gene Name"))
+                            .append($("<td>").text(gene.name)))
+                        .append($("<tr>")
+                            .append($("<td>").text("Function"))
+                            .append($("<td>").text(gene.function || "n/a")))
+                        .append($("<tr>")
+                            .append($("<td>").text("Site/s"))
+                            .append($("<td>").text(gene.sites.map(s => s.sequence).join(", ") || "n/a")))
+                        .append(!gene.sites.length ? null : $("<tr>")
+                            .append($("<td>").text("Site Position"))
+                            .append($("<td>").text(gene.sites.map(s => s.position).join(", ") || "n/a")))
+                        .append(!gene.sites.length ? null : $("<tr>")
+                            .append($("<td>").text("Site Score"))
+                            .append($("<td>").text(gene.sites.map(s => s.score).join(", ") || "n/a")))
+                    )
                     tooltip.css("visibility", "visible")
                 })
-                .on("mousemove", () => { tooltip.css("top",(d3.event.pageY-10)+"px").css("left",(d3.event.pageX+10)+"px") })
+                .on("mousemove", () => { tooltip.css("top",(event.pageY-10)+"px").css("left",(event.pageX+10)+"px") })
                 .on("mouseout", () => {
                     highlighNodeAndSpoke("#8dd3c7");
                     tooltip.css("visibility", "hidden");
                 })
+            svg.append(node);
         }
 
-        let centroidMargin = svg.append("circle")
+        let centroidMargin = $(svgElem("circle"))
             .attr("class", "centroid-margin")
             .attr("cx", svgSize / 2)
             .attr("cy", svgSize / 2)
             .attr("r", geneNodeRadius * 1.5)
             .attr("fill", "white")
+        svg.append(centroidMargin);
         
-        let centroid = svg.append("circle")
+        let centroid = $(svgElem("circle"))
             .attr("class", "centroid")
             .attr("cx", svgSize / 2)
             .attr("cy", svgSize / 2)
@@ -181,8 +185,11 @@ function drawWagonWheels(regulonNetworks) {
                     )
                     .css("visibility", "visible")
             })
-            .on("mousemove", () => { tooltip.css("top",(d3.event.pageY-10)+"px").css("left",(d3.event.pageX+10)+"px") })
+            .on("mousemove", () => { tooltip.css("top",(event.pageY-10)+"px").css("left",(event.pageX+10)+"px") })
             .on("mouseout", () => { tooltip.css("visibility", "hidden") })
+        svg.append(centroid);
+
+        graph.append(svg);
     }
 
     // Redraw if available width has changed after drawing
