@@ -34,6 +34,10 @@ function viewWagonWheels(regulogId) {
     })
 }
 
+function toRadians(degrees) {
+    return degrees / 180 * Math.PI;
+}
+
 function svgElem(tag) {
     return document.createElementNS("http://www.w3.org/2000/svg", tag);
 }
@@ -44,16 +48,30 @@ function drawWagonWheels(regulonNetworks) {
     let svgDivSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
     let svgSize = svgDivSize;
 
-    // regulonNetworks = regulonNetworks.sort((a, b) => b.targetGenes.length - a.targetGenes.length);
+    let uniqueGeneNames = regulonNetworks.map(r => r.targetGenes.map(tg => tg.name))
+                                         .reduce((a, b) => a.concat(b), [])
+                                         .filter((name, index, self) => self.indexOf(name) === index)
 
     let spokeLength = svgSize * 0.75;
-    let spokeAngle = 360 / regulonNetworks.map(r => r.targetGenes.map(tg => tg.name))
-                                          .reduce((a, b) => a.concat(b), [])
-                                          .filter((name, index, self) => self.indexOf(name) === index)
-                                          .length;
-    let geneNodeRadius = Math.min(svgSize * 0.05, 10);
+    let spokeAngle = 360 / uniqueGeneNames.length;
 
-    let geneNodePositions = {};
+    let origin = {
+        x: svgSize / 2,
+        y: svgSize / 2
+    }
+
+    let geneNodeRadius = Math.min(svgSize * 0.05, 10);
+    let geneNodePositions = (() => {
+        let positions = {};
+        uniqueGeneNames.sort().forEach((name, i) => {
+            let angle = toRadians((270 + spokeAngle * i) % 360);
+            positions[name] = {
+                x: svgSize / 2 + Math.cos(angle) * spokeLength/2,
+                y: svgSize / 2 + Math.sin(angle) * spokeLength/2
+            }
+        })
+        return positions;
+    })();
 
     let graph = $("#graph #body");
     graph.empty();
@@ -75,28 +93,13 @@ function drawWagonWheels(regulonNetworks) {
                 .text(regulon.genomeName)
         svgDiv.append(svgFooter);
 
-        let toRadians = (degrees) => degrees / 180 * Math.PI;
-
-        let from = {
-            x: svgSize / 2,
-            y: svgSize / 2
-        }
-
         for (let gene of regulon.targetGenes) {
-            let to = (() => {
-                if (!geneNodePositions[gene.name]) {
-                    geneNodePositions[gene.name] = {
-                        x: from.x + Math.cos(toRadians((270 + spokeAngle * Object.keys(geneNodePositions).length) % 360)) * spokeLength/2,
-                        y: from.y + Math.sin(toRadians((270 + spokeAngle * Object.keys(geneNodePositions).length) % 360)) * spokeLength/2
-                    }
-                }
-                return geneNodePositions[gene.name];
-            })()
+            let to = geneNodePositions[gene.name];
 
             let spoke = $(svgElem("line"))
                 .attr({
-                    "x1": from.x,
-                    "y1": from.y,
+                    "x1": origin.x,
+                    "y1": origin.y,
                     "x2": to.x,
                     "y2": to.y,
                     "stroke-width": 2,

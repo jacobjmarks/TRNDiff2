@@ -52,7 +52,7 @@ module.exports.getRegulogNetwork = (regulogId, cb) => {
         let genes = db.genes.filter(g => g.regulonId == regulon.regulonId);
 
         regulon.regulator = genes.find(g => g.name && g.name.toLowerCase() == regulon.regulatorName.toLowerCase())
-        regulon.targetGenes = genes.filter(g => g != regulon.regulator);
+        regulon.targetGenes = genes.filter(g => g.name && g != regulon.regulator);
 
         for (let gene of regulon.targetGenes) {
             gene.sites = db.sites.filter(s => s.geneVIMSSId == gene.vimssId);
