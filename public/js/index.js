@@ -111,31 +111,7 @@ $(document).ready(() => {
     })
 
     $("#select-data a.item").tab();
-
-    checkSourceStatus();
 })
-
-function checkSourceStatus() {
-    let tab = $(".tabular.menu .item[data-tab='regprecise']");
-    let tabContent = $(".tab[data-tab='regprecise']");
-    
-    tab.addClass("disabled");
-    tabContent.attr("data-tab", null);
-
-    // RegPrecise
-    $.get("/regprecise/status").done((status) => {
-        if (status == 200) {
-            tab.find(".icon").addClass("green");
-            tab.removeClass("disabled");
-            tabContent.attr("data-tab", "regprecise");
-        } else {
-            tab.find(".icon").addClass("red");
-        }
-        
-        tab.find(".icon").show();
-        tab.find(".loading").hide();
-    });
-}
 
 function populateDataTable(headers, rows, onclick) {
     $("#graph").hide();

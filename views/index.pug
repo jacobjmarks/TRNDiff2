@@ -15,12 +15,9 @@ block content
 
     #select-data
         .ui.tabular.menu
-            a.item(data-tab="regprecise")
-                i.small.loading.circle.notch.icon
-                i.small.circle.icon(style="display: none")
-                | RegPrecise
-            a.item(data-tab="regulondb") RegulonDB
-            a.item.disabled Upload
+            a.item(data-tab="regprecise") RegPrecise
+            a.item(data-tab="regulondb").disabled RegulonDB
+            a.item(data-tab="upload").disabled Upload
         .ui.tab(data-tab="regprecise")
             .ui.pointing.secondary.menu
                 a.item(data-tab="rp-genomes" data-source="rp-genomes") Genomes
@@ -41,10 +38,10 @@ block content
                     .section Regulog
                     i.right.angle.icon.divider
                     .section Graph Regulog
-        .ui.tab(data-tab="regulondb")
-            .ui.pointing.secondary.menu
-                a.item(data-tab="rdb-genomes" data-source="rdb-genomes") Genomes
-        .ui.tab(data-tab="upload")
+        //- .ui.tab(data-tab="regulondb")
+        //-     .ui.pointing.secondary.menu
+        //-         a.item(data-tab="rdb-genomes" data-source="rdb-genomes") Genomes
+        //- .ui.tab(data-tab="upload")
 
         table.ui.single.line.compact.sortable.selectable.table(style="display:none")
 
