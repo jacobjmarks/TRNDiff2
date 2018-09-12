@@ -1,0 +1,28 @@
+extends table
+
+block content
+    .ui.breadcrumb
+        .section Genome
+        i.right.angle.icon.divider
+        strong.section Regulon
+        i.right.angle.icon.divider
+        .section Graph Regulog
+
+    table.ui.single.line.compact.sortable.selectable.table
+        thead
+            tr
+                th Regulog ID
+                th Regulon ID
+                th Regulation Type
+                th Regulator Family
+                th Regulator Name
+                th Pathway
+        tbody
+            each regulon in regulons
+                tr(onclick=`window.location="/regprecise/graph?regulogId=${regulon.regulogId}"`)
+                    td= regulon.regulogId
+                    td= regulon.regulonId
+                    td= regulon.regulationType
+                    td= regulon.effector
+                    td= regulon.regulatorFamily
+                    td= regulon.regulatorName

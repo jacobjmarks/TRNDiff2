@@ -8,31 +8,23 @@ $(document).ready(() => {
         .css("visibility", "hidden")
         .css("padding", "10px")
         .css("background-color", "rgba(255,255,255,0.75)"))
+
+        drawWagonWheels();
+
+        $(window).resize(() => {
+            if ($("#graph #body").html()) drawWagonWheels()
+        })
+        
+        $("#btn-zoom-out").click(() => {
+            columns++;
+            drawWagonWheels()
+        })
+        
+        $("#btn-zoom-in").click(() => {
+            if (columns > 1) columns--;
+            drawWagonWheels()
+        })
 })
-
-function viewWagonWheels(regulogId) {
-    $("#select-data .table").empty();
-    $("#select-data .table").hide();
-
-    isLoading(true);
-    $.ajax({
-        method: "GET",
-        url: `/regprecise/regulognetwork/${regulogId}`,
-        success: (regulonNetworks) => {
-            drawWagonWheels(regulonNetworks);
-
-            $(window).resize(() => { if ($("#graph #body").html()) drawWagonWheels(regulonNetworks) })
-            $("#btn-zoom-out").unbind().click(() => { columns++; drawWagonWheels(regulonNetworks) })
-            $("#btn-zoom-in").unbind().click(() => { if (columns > 1) { columns--; drawWagonWheels(regulonNetworks) } })
-        },
-        error: () => {
-            alert("Error fetching graph network");
-        },
-        complete: () => {
-            isLoading(false);
-        }
-    })
-}
 
 function toRadians(degrees) {
     return degrees / 180 * Math.PI;
@@ -42,7 +34,7 @@ function svgElem(tag) {
     return document.createElementNS("http://www.w3.org/2000/svg", tag);
 }
 
-function drawWagonWheels(regulonNetworks) {
+function drawWagonWheels() {
     $("#graph").show();
     const svgDivMargin = 14;
     let svgDivSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;

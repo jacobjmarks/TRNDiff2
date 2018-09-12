@@ -11,14 +11,14 @@ html
         script(src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.js")
         link(link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.css")
 
-        //- jQuery-Tablesort
-        script(src="./js/tablesort.js")
+        script(src="/js/common.js")
+        link(rel="stylesheet" href="/css/global.css")
 
-        script(src="./js/common.js")
         block scripts
 
         title TRNDiff Regulon Explorer
     body
+        include includes/header
         block content
         
         #page-dimmer

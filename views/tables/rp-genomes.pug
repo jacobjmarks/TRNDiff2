@@ -1,0 +1,30 @@
+extends table
+
+block content
+    .ui.breadcrumb
+        strong.section Genome
+        i.right.angle.icon.divider
+        .section Regulon
+        i.right.angle.icon.divider
+        .section Graph Regulog
+
+    table.ui.single.line.compact.sortable.selectable.table
+        thead
+            tr
+                th RegPrecise ID
+                th TaxID
+                th Name
+                th RNA Regulons
+                th RNA Sites
+                th TF Regulons
+                th TF Sites
+        tbody
+            each genome in genomes
+                tr(onclick=`window.location="/regprecise/regulons?genomeId=${genome.genomeId}"`)
+                    td= genome.genomeId
+                    td= genome.taxonomyId
+                    td= genome.name
+                    td= genome.rnaRegulonCount
+                    td= genome.rnaSiteCount
+                    td= genome.tfRegulonCount
+                    td= genome.tfSiteCount

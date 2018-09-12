@@ -1,0 +1,24 @@
+extends layout
+
+block scripts
+    script.
+        regulonNetworks = !{network};
+    script(src="/js/wagon-wheels.js")
+    link(rel="stylesheet" href="/css/wagon-wheels.css")
+
+block content
+    .ui.breadcrumb
+        .section Genome
+        i.right.angle.icon.divider
+        .section Regulon
+        i.right.angle.icon.divider
+        strong.section Graph Regulog
+
+    #graph
+        #header
+            .ui.large.basic.right.floated.icon.buttons
+                .ui.button#btn-zoom-out
+                    i.zoom-out.icon
+                .ui.button#btn-zoom-in
+                    i.zoom-in.icon
+        #body.ui.cards(style="clear:both")
