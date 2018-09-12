@@ -78,7 +78,8 @@ function drawWagonWheels(regulonNetworks) {
 
     for (let regulon of regulonNetworks) {
         let svgDiv = $("<div>")
-            .addClass("wagonwheel ui card")
+            .addClass("ui card")
+            .addClass("wagonwheel")
             .width(svgDivSize)
 
         let svg = $(svgElem("svg"))
@@ -97,6 +98,7 @@ function drawWagonWheels(regulonNetworks) {
             let to = geneNodePositions[gene.name];
 
             let spoke = $(svgElem("line"))
+                .addClass(`gene-spoke gene-${gene.name}`)
                 .attr({
                     "x1": origin.x,
                     "y1": origin.y,
@@ -109,23 +111,13 @@ function drawWagonWheels(regulonNetworks) {
             
             if (!gene.sites.length) spoke.css("stroke-dasharray", "5, 5").css("opacity", 0.5);
 
-            function highlighNodeAndSpoke(color) {
-                $("svg").find("circle.gene-node").each(function () {
-                    let circle = $(this);
-                    if (circle.data("gene-data").name == gene.name) {
-                        circle.attr("fill", color);
-                        $("svg").find("line").each(function () {
-                            let line = $(this);
-                            if (line.attr("x2") == circle.attr("cx") && line.attr("y2") == circle.attr("cy")) {
-                                line.css("stroke", color);
-                            }
-                        })
-                    }
-                })
+            function highlight(color) {
+                $(`svg circle.gene-node.gene-${gene.name}`).attr("fill", color);
+                $(`svg line.gene-spoke.gene-${gene.name}`).css("stroke", color);
             }
 
             let node = $(svgElem("circle"))
-                .addClass("gene-node")
+                .addClass(`gene-node gene-${gene.name}`)
                 .data("gene-data", gene)
                 .attr({
                     "cx": to.x,
@@ -134,7 +126,7 @@ function drawWagonWheels(regulonNetworks) {
                     "fill": "#8dd3c7"
                 })
                 .on("mouseover", () => {
-                    highlighNodeAndSpoke("blue");
+                    highlight("blue");
 
                     tooltip.empty();
                     tooltip.append($("<table>")
@@ -161,7 +153,7 @@ function drawWagonWheels(regulonNetworks) {
                 })
                 .on("mousemove", () => { tooltip.css("top",(event.pageY-10)+"px").css("left",(event.pageX+10)+"px") })
                 .on("mouseout", () => {
-                    highlighNodeAndSpoke("#8dd3c7");
+                    highlight("#8dd3c7");
                     tooltip.css("visibility", "hidden");
                 })
             svg.append(node);
