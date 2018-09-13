@@ -2,17 +2,24 @@ extends layout
 
 block scripts
     script.
-        regulonNetworks = !{network};
+        regulonNetworks = !{network}.regulons;
     script(src="/js/wagon-wheels.js")
     link(rel="stylesheet" href="/css/wagon-wheels.css")
 
 block content
-    .ui.breadcrumb
-        .section Genome
-        i.right.angle.icon.divider
-        .section Regulon
-        i.right.angle.icon.divider
-        strong.section Graph Regulog
+    .ui.three.steps
+        a.step.completed(href="/regprecise/genomes")
+            .content
+                .title Genome
+                .description Select a Genome
+        a.step.completed(href=`/regprecise/regulons?genomeId=${JSON.parse(network).regulons.find(r => r.regulonId == JSON.parse(network)["selected-regulon"]).genomeId}`)
+            .content
+                .title Regulon
+                .description Select a Regulon
+        a.step.active
+            .content
+                .title Regulog Graph
+                .description Network of selected Regulon
 
     #graph
         #header

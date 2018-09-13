@@ -45,10 +45,13 @@ module.exports.sites = (filter, cb) => {
 
 module.exports.status = (cb) => cb(null, 200);
 
-module.exports.getRegulogNetwork = (regulogId, cb) => {
-    let network = db.regulons.filter(r => r.regulogId == regulogId);
+module.exports.getRegulogNetwork = (regulonId, cb) => {
+    let network = {};
+    let regulon = db.regulons.find(r => r.regulonId == regulonId);
+    network["selected-regulon"] = regulon.regulonId;
+    network["regulons"] = db.regulons.filter(r => r.regulogId == regulon.regulogId);
 
-    for (let regulon of network) {
+    for (let regulon of network["regulons"]) {
         let genes = db.genes.filter(g => g.regulonId == regulon.regulonId);
 
         regulon.regulator = genes.find(g => g.name && g.name.toLowerCase() == regulon.regulatorName.toLowerCase())

@@ -1,12 +1,19 @@
 extends table
 
 block content
-    .ui.breadcrumb
-        strong.section Genome
-        i.right.angle.icon.divider
-        .section Regulon
-        i.right.angle.icon.divider
-        .section Graph Regulog
+    .ui.three.steps
+        a.step.active(href="/regprecise/genomes")
+            .content
+                .title Genome
+                .description Select a Genome
+        .step.disabled
+            .content
+                .title Regulon
+                .description Select a Regulon
+        .step.disabled
+            .content
+                .title Regulog Graph
+                .description Network of selected Regulon
 
     table.ui.single.line.compact.sortable.selectable.table
         thead

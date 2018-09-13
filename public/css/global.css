@@ -1,3 +1,7 @@
 body {
     padding: 15px;
 }
+
+.ui.steps {
+    text-align: center;
+}

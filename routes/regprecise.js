@@ -27,10 +27,13 @@ router.get("/regulogs", (req, res) => {
 });
 
 router.get("/regulons", (req, res) => {
-    regprecise.regulons(generateFilter(req.query), (err, regulons) => {
+    if (!Object.keys(req.query).length || !req.query.genomeId) return res.redirect("/regprecise/genomes");
+    regprecise.genomes(g => g.genomeId == req.query.genomeId, (err, genome) => {
         if (err) { console.error(err); return res.status(500).end(); }
-        if (req.headers["content-type"] == "application/json") return res.json(regulons);
-        res.render("tables/rp-regulons.pug", { regulons: regulons });
+        regprecise.regulons(r => r.genomeId == req.query.genomeId, (err, regulons) => {
+            if (err) { console.error(err); return res.status(500).end(); }
+            res.render("tables/rp-regulons.pug", { genome: genome, regulons: regulons });
+        });
     });
 });
 
@@ -42,8 +45,8 @@ router.get("/genes", (req, res) => {
 });
 
 router.get("/graph", (req, res) => {
-    if (!Object.keys(req.query).length || !req.query.regulogId) return res.redirect("/");
-    regprecise.getRegulogNetwork(req.query.regulogId, (err, network) => {
+    if (!Object.keys(req.query).length || !req.query.regulonId) return res.redirect("/regprecise/genomes");
+    regprecise.getRegulogNetwork(req.query.regulonId, (err, network) => {
         if (err) { console.error(err); return res.status(500).end(); }
         if (req.headers["content-type"] == "application/json") return res.json(network);
         res.render("wagon-wheels.pug", { network: JSON.stringify(network) });
