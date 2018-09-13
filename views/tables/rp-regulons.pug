@@ -4,8 +4,8 @@ block content
     .ui.three.steps
         a.step.completed(href="/regprecise/genomes")
             .content
-                .title Genome
-                .description Select a Genome
+                .title= genome.name
+                .description Selected Genome
         a.step.active(href=`/regprecise/regulons?genomeId=${genome.genomeId}`)
             .content
                 .title Regulon
@@ -30,6 +30,6 @@ block content
                     td= regulon.regulogId
                     td= regulon.regulonId
                     td= regulon.regulationType
-                    td= regulon.effector
                     td= regulon.regulatorFamily
                     td= regulon.regulatorName
+                    td= regulon.effector

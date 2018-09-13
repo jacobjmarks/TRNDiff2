@@ -50,6 +50,7 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
     let regulon = db.regulons.find(r => r.regulonId == regulonId);
     network["selected-regulon"] = regulon.regulonId;
     network["regulons"] = db.regulons.filter(r => r.regulogId == regulon.regulogId);
+    network["selected-genome"] = db.genomes.find(g => g.genomeId == regulon.genomeId);
 
     for (let regulon of network["regulons"]) {
         let genes = db.genes.filter(g => g.regulonId == regulon.regulonId);

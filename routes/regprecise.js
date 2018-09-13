@@ -32,7 +32,7 @@ router.get("/regulons", (req, res) => {
         if (err) { console.error(err); return res.status(500).end(); }
         regprecise.regulons(r => r.genomeId == req.query.genomeId, (err, regulons) => {
             if (err) { console.error(err); return res.status(500).end(); }
-            res.render("tables/rp-regulons.pug", { genome: genome, regulons: regulons });
+            res.render("tables/rp-regulons.pug", { genome: genome[0], regulons: regulons });
         });
     });
 });
@@ -49,7 +49,7 @@ router.get("/graph", (req, res) => {
     regprecise.getRegulogNetwork(req.query.regulonId, (err, network) => {
         if (err) { console.error(err); return res.status(500).end(); }
         if (req.headers["content-type"] == "application/json") return res.json(network);
-        res.render("wagon-wheels.pug", { network: JSON.stringify(network) });
+        res.render("wagon-wheels.pug", { network: network });
     })
 });
 
