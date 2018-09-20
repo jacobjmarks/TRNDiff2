@@ -54,6 +54,7 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
 
     for (let regulon of network["regulons"]) {
         let genes = db.genes.filter(g => g.regulonId == regulon.regulonId);
+        genes = genes.filter(g => g.name != undefined);
 
         regulon.regulator = genes.find(g => g.name && g.name.toLowerCase() == regulon.regulatorName.toLowerCase())
         regulon.targetGenes = genes.filter(g => g.name && g != regulon.regulator);
@@ -63,5 +64,67 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
         }
     }
 
+    // Calculate and add distances...
+
+    let uniqueGeneNames = network["regulons"].map(r => r.targetGenes.map(tg => tg.name))
+                                             .reduce((a, b) => a.concat(b), [])
+                                             .filter((name, index, self) => self.indexOf(name) === index)
+
+    let binaryGeneMatrix = generateBinaryGeneMatrix(uniqueGeneNames, network["regulons"]);
+    let target = binaryGeneMatrix[regulonId];
+
+    for (let key of Object.keys(binaryGeneMatrix)) {
+        network["regulons"].find(r => r.regulonId == key).distance = hammingDist(target, binaryGeneMatrix[key]);
+    }
+
+    network.regulons = network.regulons.sort((a, b) => a.distance - b.distance);
+
+    network.regulons.forEach(r => console.log(r.distance));
+
     cb(null, network);
+}
+
+function generateBinaryGeneMatrix(geneNames, regulons) {
+    let matrix = {};
+
+    for (let regulon of regulons) {
+        let vector = "";
+        for (let geneName of geneNames) {
+            vector += regulon.targetGenes.find(g => g.name == geneName) ? "1" : "0";
+        }
+        matrix[regulon.regulonId] = vector;
+    }
+
+    return matrix;
+}
+
+function hammingDist(a, b) {
+    let dist = 0;
+
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] != b[i]) dist++;
+    }
+
+    return dist;
+}
+
+function levensteinDist(a, b) {
+    let m = [], i, j, min = Math.min;
+
+    if (!(a && b)) return (b || a).length;
+
+    for (i = 0; i <= b.length; m[i] = [i++]);
+    for (j = 0; j <= a.length; m[0][j] = j++);
+
+    for (i = 1; i <= b.length; i++) {
+        for (j = 1; j <= a.length; j++) {
+            m[i][j] = b.charAt(i - 1) == a.charAt(j - 1)
+                ? m[i - 1][j - 1]
+                : m[i][j] = min(
+                    m[i - 1][j - 1] + 1, 
+                    min(m[i][j - 1] + 1, m[i - 1 ][j]))
+        }
+    }
+
+    return m[b.length][a.length];
 }
