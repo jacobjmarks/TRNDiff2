@@ -1,6 +1,6 @@
 $(document).ready(() => {
     $("#sort-regulons-by.dropdown").dropdown({
-        action: (text, value) => {
+        onChange: (value) => {
             regulonNetworks.sort((a, b) => {
                 switch(value) {
                     case "distance":
