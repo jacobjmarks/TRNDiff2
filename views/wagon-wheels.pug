@@ -4,6 +4,7 @@ block scripts
     script.
         regulonNetworks = !{JSON.stringify(network)}.regulons;
     script(src="/js/wagon-wheels.js")
+    script(src="/js/graph-header.js")
     link(rel="stylesheet" href="/css/wagon-wheels.css")
 
 block content
@@ -24,9 +25,26 @@ block content
 
     #graph
         #header
-            .ui.large.basic.right.floated.icon.buttons
-                .ui.button#btn-zoom-out
-                    i.zoom-out.icon
-                .ui.button#btn-zoom-in
-                    i.zoom-in.icon
+            .ui.stackable.secondary.menu
+                .ui.item Sort Regulons By:
+                .ui.item.dropdown#sort-regulons-by
+                    .text Distance
+                    i.dropdown.icon
+                    .menu
+                        .item(data-value="distance").active.selected Distance
+                        .item(data-value="gene-count") Gene Count
+                        .item(data-value="name") Genome Name
+                .ui.item Sort Genes By:
+                .ui.item.dropdown#sort-genes-by
+                    .text Name
+                    i.dropdown.icon
+                    .menu
+                        .item(data-value="distance").active.selected Name
+
+                .right.item
+                    .ui.large.basic.right.floated.icon.buttons
+                        btn.ui.button#btn-zoom-out
+                            i.zoom-out.icon
+                        btn.ui.button#btn-zoom-in
+                            i.zoom-in.icon
         #body.ui.cards(style="clear:both")
