@@ -40,9 +40,11 @@ function drawWagonWheels() {
     let svgDivSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
     let svgSize = svgDivSize;
 
-    let uniqueGeneNames = regulonNetworks.map(r => r.targetGenes.map(tg => tg.name))
-                                         .reduce((a, b) => a.concat(b), [])
-                                         .filter((name, index, self) => self.indexOf(name) === index)
+    let regulons = regulogNetwork.regulons;
+
+    let uniqueGeneNames = regulons.map(r => r.targetGenes.map(tg => tg.name))
+                                  .reduce((a, b) => a.concat(b), [])
+                                  .filter((name, index, self) => self.indexOf(name) === index)
 
     let spokeLength = svgSize * 0.75;
     let spokeAngle = 360 / uniqueGeneNames.length;
@@ -68,11 +70,15 @@ function drawWagonWheels() {
     let graph = $("#graph #body");
     graph.empty();
 
-    for (let regulon of regulonNetworks) {
+    for (let regulon of regulons) {
         let svgDiv = $("<div>")
             .addClass("ui card")
             .addClass("wagonwheel")
             .width(svgDivSize)
+
+        if (regulon.regulonId == regulogNetwork["selected-regulon"]) {
+            svgDiv.css("border", "1px solid blue");
+        }
 
         let svg = $(svgElem("svg"))
             .attr({
@@ -203,6 +209,6 @@ function drawWagonWheels() {
     // Redraw if available width has changed after drawing
     // (usually due to scrollbar popin)
     if ($("#graph").width() < (svgDivSize + svgDivMargin) * columns) {
-        drawWagonWheels(regulonNetworks);
+        drawWagonWheels();
     }
 }

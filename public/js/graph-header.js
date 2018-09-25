@@ -1,7 +1,7 @@
 $(document).ready(() => {
     $("#sort-regulons-by.dropdown").dropdown({
         onChange: (value) => {
-            regulonNetworks.sort((a, b) => {
+            regulogNetwork.regulons.sort((a, b) => {
                 switch(value) {
                     case "distance":
                         return a.distance - b.distance;
