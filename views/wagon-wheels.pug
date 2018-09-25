@@ -28,10 +28,11 @@ block content
             .ui.stackable.secondary.menu
                 .ui.item Sort Regulons By:
                 .ui.item.dropdown#sort-regulons-by
-                    .text Distance From Selected
+                    .text Hamming Distance
                     i.dropdown.icon
                     .menu
-                        .item(data-value="distance").active.selected Distance From Selected
+                        .item(data-value="hamming-distance").active.selected Hamming Distance
+                        .item(data-value="levenstein-distance") Levenstein Distance
                         .item(data-value="gene-count") Gene Count
                         .item(data-value="genome-name") Genome Name
                 .ui.item Sort Genes By:

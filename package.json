@@ -16,7 +16,9 @@
     "request": "^2.87.0",
     "soap": "^0.25.0"
   },
-  "nodemonConfig" : {
-    "ignore": ["db"]
+  "nodemonConfig": {
+    "ignore": [
+      "db"
+    ]
   }
 }

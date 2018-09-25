@@ -74,12 +74,12 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
     let target = binaryGeneMatrix[regulonId];
 
     for (let key of Object.keys(binaryGeneMatrix)) {
-        network["regulons"].find(r => r.regulonId == key).distance = hammingDist(target, binaryGeneMatrix[key]);
+        let regulon = network["regulons"].find(r => r.regulonId == key);
+        regulon.hammingDist = hammingDist(target, binaryGeneMatrix[key]);
+        regulon.levensteinDist = levensteinDist(target, binaryGeneMatrix[key]);
     }
 
-    network.regulons = network.regulons.sort((a, b) => a.distance - b.distance);
-
-    network.regulons.forEach(r => console.log(r.distance));
+    network.regulons = network.regulons.sort((a, b) => a.hammingDist - b.hammingDist);
 
     cb(null, network);
 }

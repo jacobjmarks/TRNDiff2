@@ -3,8 +3,10 @@ $(document).ready(() => {
         onChange: (value) => {
             regulogNetwork.regulons.sort((a, b) => {
                 switch(value) {
-                    case "distance":
-                        return a.distance - b.distance;
+                    case "hamming-distance":
+                        return a.hammingDist - b.hammingDist;
+                    case "levenstein-distance":
+                        return a.levensteinDist - b.levensteinDist;
                     case "gene-count":
                         return b.targetGenes.length - a.targetGenes.length;
                     case "genome-name":
