@@ -21,6 +21,21 @@ $(document).ready(() => {
     });
 
     $("#sort-genes-by.dropdown").dropdown({
+        onChange: (value) => {
+            geneSortFunc = (() => {
+                switch(value) {
+                    case "name":
+                        return (a, b) => a.name.localeCompare(b.name);
+                    case "function":
+                        return (a, b) => a.function.localeCompare(b.function);
+                    case "go-term":
+                        return (a, b) => a.term.localeCompare(b.term);
+                    default:
+                        return () => true;
+                }
+            })()
 
+            drawWagonWheels();
+        }
     });
 })

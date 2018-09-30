@@ -1,5 +1,7 @@
 let columns = 4;
 
+let geneSortFunc = (a, b) => a.name.localeCompare(b.name);
+
 const goTermColors = {
     "catalytic activity":               "#8dd3c7",
     "binding":                          "#bebada",
@@ -59,12 +61,18 @@ function drawWagonWheels() {
 
     let regulons = regulogNetwork.regulons;
 
-    let uniqueGeneNames = regulons.map(r => r.targetGenes.map(tg => tg.name))
-                                  .reduce((a, b) => a.concat(b), [])
-                                  .filter((name, index, self) => self.indexOf(name) === index)
+    let uniqueGenes = regulons
+                        .map(r => r.targetGenes)
+                        .reduce((a, b) => a.concat(b), [])
+                        .reduce((a, b) => {
+                            if (!a.find(g => g.name == b.name)) {
+                                a.push(b);
+                            }
+                            return a;
+                        }, [])
 
     let spokeLength = svgSize * 0.75;
-    let spokeAngle = 360 / uniqueGeneNames.length;
+    let spokeAngle = 360 / uniqueGenes.length;
 
     let origin = {
         x: svgSize / 2,
@@ -74,7 +82,7 @@ function drawWagonWheels() {
     let geneNodeRadius = Math.min(svgSize * 0.05, 10);
     let geneNodePositions = (() => {
         let positions = {};
-        uniqueGeneNames.sort().forEach((name, i) => {
+        uniqueGenes.sort(geneSortFunc).map(g => g.name).forEach((name, i) => {
             let angle = toRadians((270 + spokeAngle * i) % 360);
             positions[name] = {
                 x: svgSize / 2 + Math.cos(angle) * spokeLength/2,
