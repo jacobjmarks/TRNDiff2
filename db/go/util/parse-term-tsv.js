@@ -1,14 +1,14 @@
 const fs = require("fs");
 
-let tsv = fs.readFileSync("go-terms.tsv").toString();
+let tsv = fs.readFileSync("term.tsv").toString();
 let lines = tsv.split("\n");
 
-let terms = [];
+let results = [];
 
 for (let line of lines) {
     let values = line.split("\t");
 
-    terms.push({
+    results.push({
         id: Number.parseInt(values[0]),
         name: values[1],
         term_type: values[2],
@@ -19,4 +19,4 @@ for (let line of lines) {
     });
 }
 
-fs.writeFileSync("go-terms.json", JSON.stringify(terms));
+fs.writeFileSync("term.json", JSON.stringify(results));
