@@ -1,5 +1,22 @@
 let columns = 4;
 
+const goTermColors = {
+    "catalytic activity":               "#8dd3c7",
+    "binding":                          "#bebada",
+    "transporter activity":             "#fb8072",
+    "molecular function regulator":     "#80b1d3",
+    "transcription regulator activity": "#fdb462",
+    "molecular carrier activity":       "#b3de69",
+    "molecular transducer activity":    "#fccde5",
+    "cargo receptor activity":          "#d9d9d9",
+    "translation regulator activity":   "#bc80bd",
+    "protein tag":                      "#ccebc5",
+    "antioxidant activity":             "#a6cee3",
+    "structural molecule activity":     "#1f78b4",
+    "molecular_function":               "#b2df8a",
+    "hijacked molecular function":      "#33a02c"
+};
+
 $(document).ready(() => {
     $("body").append(tooltip = $("<tooltip>")
         .addClass("ui segment")
@@ -95,6 +112,8 @@ function drawWagonWheels() {
         for (let gene of regulon.targetGenes) {
             let to = geneNodePositions[gene.name];
 
+            let color = goTermColors[gene.term];
+
             let spoke = $(svgElem("line"))
                 .addClass(`gene-spoke gene-${gene.name}`)
                 .attr({
@@ -103,7 +122,7 @@ function drawWagonWheels() {
                     "x2": to.x,
                     "y2": to.y,
                     "stroke-width": 2,
-                    "stroke": "#8dd3c7"
+                    "stroke": color
                 })
             svg.append(spoke);
             
@@ -121,7 +140,7 @@ function drawWagonWheels() {
                     "cx": to.x,
                     "cy": to.y,
                     "r": geneNodeRadius,
-                    "fill": "#8dd3c7"
+                    "fill": color
                 })
                 .on("mouseover", () => {
                     highlight("blue");
@@ -151,7 +170,7 @@ function drawWagonWheels() {
                 })
                 .on("mousemove", () => { tooltip.css("top",(event.pageY-10)+"px").css("left",(event.pageX+10)+"px") })
                 .on("mouseout", () => {
-                    highlight("#8dd3c7");
+                    highlight(color);
                     tooltip.css("visibility", "hidden");
                 })
             svg.append(node);

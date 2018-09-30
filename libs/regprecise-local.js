@@ -19,6 +19,11 @@ const db = {
     sites: parse("sites.json")
 }
 
+const gotermZip = new AdmZip("./db/go/rp-gene-terms.json.zip");
+gotermZip.extractAllTo("./db/go/");
+
+const goTerms = JSON.parse(fs.readFileSync("./db/go/rp-gene-terms.json"));
+
 module.exports.genomes = (filter, cb) => {
     cb(null, db.genomes.filter(filter));
 }
@@ -61,6 +66,7 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
 
         for (let gene of regulon.targetGenes) {
             gene.sites = db.sites.filter(s => s.geneVIMSSId == gene.vimssId);
+            gene.term = goTerms.find(t => t.geneName == gene.name).term;
         }
     }
 
