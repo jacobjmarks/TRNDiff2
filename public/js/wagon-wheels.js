@@ -122,6 +122,8 @@ function drawWagonWheels() {
 
             let color = goTermColors[gene.term];
 
+            updateGoTermLegend(gene.term);
+
             let spoke = $(svgElem("line"))
                 .addClass(`gene-spoke gene-${gene.name}`)
                 .attr({
@@ -239,5 +241,23 @@ function drawWagonWheels() {
     // (usually due to scrollbar popin)
     if ($("#graph").width() < (svgDivSize + svgDivMargin) * columns) {
         drawWagonWheels();
+    }
+}
+
+/**
+ * Adds an entry for the given term in the GO
+ * Term color legend if it does not yet exist.
+ * @param {string} term Term to add
+ */
+function updateGoTermLegend(term) {
+    if ((legend = $("#goterm-legend")).has(`[id="${term}"]`).length < 1) {
+        legend.append(
+            $("<div>").addClass("ui large label").attr("id", term)
+                .append(
+                    $("<i>").addClass("square icon")
+                        .css("color", goTermColors[term])
+                )
+                .append(term)
+        )
     }
 }

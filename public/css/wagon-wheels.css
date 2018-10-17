@@ -7,3 +7,19 @@
     padding: 5px;
     padding-top: 0px;
 }
+
+#goterm-legend {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-evenly;
+    margin: 5px 0px;
+}
+
+#goterm-legend .label {
+    /* flex-grow: 1; */
+    /* min-width: max-content; */
+    /* display: flex; */
+    padding: 5px 15px;
+    margin-bottom: 5px;
+    /* border: 1px solid grey !important; */
+}
