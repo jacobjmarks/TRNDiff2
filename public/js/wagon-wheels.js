@@ -79,7 +79,7 @@ function drawWagonWheels() {
         y: svgSize / 2
     }
 
-    let geneNodeRadius = Math.min(svgSize * 0.05, 10);
+    let geneNodeRadius = Math.min(spokeLength/2 * toRadians(spokeAngle) / 2, 10);
     let geneNodePositions = (() => {
         let positions = {};
         uniqueGenes.sort(geneSortFunc).map(g => g.name).forEach((name, i) => {
@@ -184,12 +184,14 @@ function drawWagonWheels() {
             svg.append(node);
         }
 
+        let centroidRadius = Math.min(svgSize * 0.05, 10);
+
         let centroidMargin = $(svgElem("circle"))
             .addClass("centroid-margin")
             .attr({
                 "cx": svgSize / 2,
                 "cy": svgSize / 2,
-                "r": geneNodeRadius * 1.5,
+                "r": centroidRadius * 1.5,
                 "fill": "white"
             })
         svg.append(centroidMargin);
@@ -199,7 +201,7 @@ function drawWagonWheels() {
             .attr({
                 "cx": svgSize / 2,
                 "cy": svgSize / 2,
-                "r": geneNodeRadius
+                "r": centroidRadius
             })
             .on("mouseover", () => {
                 tooltip.empty();
