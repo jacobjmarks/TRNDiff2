@@ -250,14 +250,43 @@ function drawWagonWheels() {
  * @param {string} term Term to add
  */
 function updateGoTermLegend(term) {
-    if ((legend = $("#goterm-legend")).has(`[id="${term}"]`).length < 1) {
-        legend.append(
-            $("<div>").addClass("ui large label").attr("id", term)
-                .append(
-                    $("<i>").addClass("square icon")
-                        .css("color", goTermColors[term])
-                )
-                .append(term)
-        )
+    let legend = $("#goterm-legend");
+    if (legend.has(`[id="${term}"]`).length < 1) {
+        let xBtn = $("<i>").addClass("delete icon")
+            .click((e) => {
+                e.stopPropagation();
+                highlightTerm(term, 1);
+                xBtn.detach();
+            })
+        
+        let label = $("<a>").addClass("ui large label").attr("id", term)
+            .append(
+                $("<i>").addClass("square icon")
+                    .css("color", goTermColors[term])
+            )
+            .append(term)
+            .click(() => {
+                legend.find(".delete.icon").click();
+                highlightTerm(term, "0.2");
+                label.append(xBtn);
+            })
+
+        legend.append(label);
     }
+}
+
+/**
+ * Highlight all nodes that belong to the given GO term. Works by setting the
+ * opacity of all ~other~ nodes to the provided value.
+ * @param {string} term Term to highlight
+ * @param {Number} opacity Opacity of other nodes
+ */
+function highlightTerm(term, opacity) {
+    $.each($(".gene-node"), (i, node) => {
+        let gene = $(node).data("gene-data");
+        if (gene.term != term) {
+            $(`svg circle.gene-node.gene-${gene.name}`).css("opacity", opacity);
+            $(`svg line.gene-spoke.gene-${gene.name}`).css("opacity", opacity);
+        };
+    })
 }
