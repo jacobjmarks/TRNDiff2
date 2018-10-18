@@ -1,5 +1,14 @@
 extends table
 
+block scripts
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js")
+    link(rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.css")
+
+    script(src="/js/directed-graph.js")
+
+    script.
+        tfNetwork = !{JSON.stringify(network)};
+
 block content
     .ui.three.steps
         a.step.completed(href="/regprecise/genomes")
@@ -15,21 +24,33 @@ block content
                 .title Regulog Graph
                 .description Network of selected Regulon
 
-    table.ui.single.line.compact.sortable.selectable.table
-        thead
-            tr
-                th Regulog ID
-                th Regulon ID
-                th Regulation Type
-                th Regulator Family
-                th Regulator Name
-                th Pathway
-        tbody
-            each regulon in regulons
-                tr(onclick=`window.location="/regprecise/graph?regulonId=${regulon.regulonId}"`)
-                    td= regulon.regulogId
-                    td= regulon.regulonId
-                    td= regulon.regulationType
-                    td= regulon.regulatorFamily
-                    td= regulon.regulatorName
-                    td= regulon.effector
+    #graph-or-table
+        .ui.pointing.two.item.secondary.menu
+            a.item(data-tab="regulator-graph").active Regulator Graph
+            a.item(data-tab="regulon-table") Regulon Table
+        .ui.tab(data-tab="regulator-graph")
+            #directed-graph
+                #header
+                #body(style="width:100%;height:500px")
+        .ui.tab(data-tab="regulon-table")
+            table.ui.single.line.compact.sortable.selectable.table
+                thead
+                    tr
+                        th Regulog ID
+                        th Regulon ID
+                        th Regulation Type
+                        th Regulator Family
+                        th Regulator Name
+                        th Pathway
+                tbody
+                    each regulon in regulons
+                        tr(onclick=`window.location="/regprecise/graph?regulonId=${regulon.regulonId}"`)
+                            td= regulon.regulogId
+                            td= regulon.regulonId
+                            td= regulon.regulationType
+                            td= regulon.regulatorFamily
+                            td= regulon.regulatorName
+                            td= regulon.effector
+
+    script.
+        $("#graph-or-table .menu a.item").tab();

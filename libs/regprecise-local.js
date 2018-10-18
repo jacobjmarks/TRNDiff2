@@ -50,6 +50,18 @@ module.exports.sites = (filter, cb) => {
 
 module.exports.status = (cb) => cb(null, 200);
 
+module.exports.getTFNetwork = (genomeId, cb) => {
+    let regulons = db.regulons.filter(r => r.genomeId == genomeId);
+
+    for (let regulon of regulons) {
+        regulon.targetRegulators = db.genes.filter(g => g.name && g.vimssId && g.regulonId == regulon.regulonId);
+    }
+
+    regulons = regulons.filter(r => r.regulatorName);
+
+    cb(null, regulons);
+}
+
 module.exports.getRegulogNetwork = (regulonId, cb) => {
     let network = {};
     let regulon = db.regulons.find(r => r.regulonId == regulonId);

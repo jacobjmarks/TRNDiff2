@@ -28,11 +28,18 @@ router.get("/regulogs", (req, res) => {
 
 router.get("/regulons", (req, res) => {
     if (!Object.keys(req.query).length || !req.query.genomeId) return res.redirect("/regprecise/genomes");
+
     regprecise.genomes(g => g.genomeId == req.query.genomeId, (err, genome) => {
         if (err) { console.error(err); return res.status(500).end(); }
+
         regprecise.regulons(r => r.genomeId == req.query.genomeId, (err, regulons) => {
             if (err) { console.error(err); return res.status(500).end(); }
-            res.render("tables/rp-regulons.pug", { genome: genome[0], regulons: regulons });
+
+            regprecise.getTFNetwork(req.query.genomeId, (err, network) => {
+                if (err) { console.error(err); return res.status(500).end(); }
+
+                res.render("tables/rp-regulons.pug", { genome: genome[0], regulons: regulons, network: network });
+            })
         });
     });
 });
