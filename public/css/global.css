@@ -5,3 +5,7 @@ body {
 .ui.steps {
     text-align: center;
 }
+
+.ui.steps .step {
+    padding: 10px !important;
+}
