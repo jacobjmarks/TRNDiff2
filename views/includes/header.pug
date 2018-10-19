@@ -1,35 +1,10 @@
-.ui.huge.header
-    a.ui.huge.image(href="http://qut.edu.au/" target="_blank")
-        img(src="/img/qut-logo.jpg")
-    .content TRNDiff Regulon Explorer
-        .sub.header Hello World
-
-#select-data
-    .ui.tabular.menu
-        a.item(data-tab="regprecise") RegPrecise
-        a.item(data-tab="regulondb").disabled RegulonDB
-        a.item(data-tab="upload").disabled Upload
-    .ui.tab(data-tab="regprecise")
-        .ui.pointing.secondary.menu
-            a.item(href="/regprecise/genomes") Genomes
-            a.item.disabled Regulogs
-    //-     .ui.tab(data-tab="rp-genomes")
-    //-     .ui.tab(data-tab="rp-regulogs")
-    //-         .ui.breadcrumb
-    //-             .section Collection Type
-    //-             i.right.angle.icon.divider
-    //-             .section Collection
-    //-             i.right.angle.icon.divider
-    //-             .section Regulog
-    //-             i.right.angle.icon.divider
-    //-             .section Graph Regulog
-    //- .ui.tab(data-tab="regulondb")
-    //-     .ui.pointing.secondary.menu
-    //-         a.item(data-tab="rdb-genomes" data-source="rdb-genomes") Genomes
-    //- .ui.tab(data-tab="upload")
-    
-style.
-    .pointing.secondary.menu { margin-bottom: 1em; }
-
-script.
-    $("#select-data a.item").tab();
+.ui.secondary.stackable.large.menu(style="margin-bottom:0")
+    .ui.huge.header
+        a.ui.huge.image(href="http://qut.edu.au/" target="_blank")
+            img(src="/img/qut-logo.jpg")
+        .content
+            a.button(href="/") TRNDiff Regulon Explorer
+            .sub.header Queensland University of Technology
+    .right.menu
+        a.item(href="/regprecise/genomes") REGPRECISE
+        a.item.disabled UPLOAD
