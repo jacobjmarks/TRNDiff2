@@ -87,6 +87,7 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
     let uniqueGeneNames = network["regulons"].map(r => r.targetGenes.map(tg => tg.name))
                                              .reduce((a, b) => a.concat(b), [])
                                              .filter((name, index, self) => self.indexOf(name) === index)
+                                             .sort((a, b) => a.localeCompare(b))
 
     let binaryGeneMatrix = generateBinaryGeneMatrix(uniqueGeneNames, network["regulons"]);
     let target = binaryGeneMatrix[regulonId];
@@ -96,6 +97,8 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
         regulon.hammingDist = hammingDist(target, binaryGeneMatrix[key]);
         regulon.levensteinDist = levensteinDist(target, binaryGeneMatrix[key]);
     }
+
+    network.binaryGeneMatrix = binaryGeneMatrix;
 
     network.regulons = network.regulons.sort((a, b) => a.hammingDist - b.hammingDist);
 

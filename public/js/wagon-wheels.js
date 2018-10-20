@@ -43,6 +43,10 @@ $(document).ready(() => {
             if (columns > 1) columns--;
             drawWagonWheels()
         })
+
+        $("#btn-compare-and").click(() => { compareSelected("AND") })
+        $("#btn-compare-or").click(() => { compareSelected("OR") })
+        $("#btn-compare-xor").click(() => { compareSelected("XOR") })
 })
 
 function toRadians(degrees) {
@@ -70,6 +74,11 @@ function drawWagonWheels() {
                         }
                         return a;
                     }, [])
+                    .sort(geneSortFunc)
+
+    if (!window.uniqueGenesByName) {
+        uniqueGenesByName = [...uniqueGenes].sort((a, b) => a.name.localeCompare(b.name));
+    }
 
     spokeLength = svgSize * 0.75;
     spokeAngle = 360 / uniqueGenes.length;
@@ -82,7 +91,7 @@ function drawWagonWheels() {
     geneNodeRadius = Math.min(spokeLength/2 * toRadians(spokeAngle) / 2, 10);
     geneNodePositions = (() => {
         let positions = {};
-        uniqueGenes.sort(geneSortFunc).map(g => g.name).forEach((name, i) => {
+        uniqueGenes.map(g => g.name).forEach((name, i) => {
             let angle = toRadians((270 + spokeAngle * i) % 360);
             positions[name] = {
                 x: svgSize / 2 + Math.cos(angle) * spokeLength/2,
@@ -96,7 +105,7 @@ function drawWagonWheels() {
     graph.empty();
 
     for (let regulon of regulons) {
-        regulon.selectable = true;
+        if (!Object.keys(regulon).includes("selectable")) regulon.selectable = true;
         drawWagonWheel(regulon, graph);
     }
 
@@ -118,6 +127,7 @@ function drawWagonWheel(regulon, div) {
         .addClass("ui card")
         .addClass("wagonwheel")
         .width(svgDivSize)
+        .data("regulon-data", regulon)
 
     if (regulon.selectable) {
         svgDiv
@@ -275,6 +285,70 @@ function drawWagonWheel(regulon, div) {
     div.append(svgDiv);
 
     $(".gene-node, .centroid, .centroid-margin").hover(function(e) { e.stopPropagation() });
+}
+
+/**
+ * Compare all selected regulon wagonwheels with the given binary method.
+ * @param {string} method Binary comparison method (AND/OR/XOR)
+ */
+function compareSelected(method) {
+    if ($(".wagonwheel.active").toArray().length < 2) return;
+    let regulons = $(".wagonwheel.active").toArray().map((ww) => $(ww).data("regulon-data"));
+
+    let binaryGeneMatrix = regulons.map((r) => r.regulonId).map((rId) => regulogNetwork.binaryGeneMatrix[rId]);
+
+    let resultingMatrix = binaryGeneMatrix[0].split('');
+    let determined = 0;
+
+    for (let i = 1; i < binaryGeneMatrix.length; i++) {
+        for (let j = determined; j < binaryGeneMatrix[i].length; j++) {
+            switch (method) {
+                case "AND":
+                    if (resultingMatrix[j] == '1' && binaryGeneMatrix[i][j] == '1') {
+                        continue;
+                    } else {
+                        resultingMatrix[j] = '0';
+                        determined++;
+                    }
+                    continue;
+                case "OR":
+                    if (resultingMatrix[j] == '1') continue;
+                    if (binaryGeneMatrix[i][j] == '1') {
+                        resultingMatrix[j] = '1';
+                        determined++;
+                        continue;
+                    }
+                    continue;
+                case "XOR":
+                    if (resultingMatrix[j] != binaryGeneMatrix[i][j]) {
+                        resultingMatrix[j] = '1';
+                    } else {
+                        resultingMatrix[j] = '0';
+                    }
+                    determined++;
+                    continue;
+                default:
+                    continue;
+            }
+        }
+    }
+
+    let result = {
+        genomeName: regulons.map(r => r.genomeName).join(' [' + method + '] '),
+        regulatorFamily: regulons[0].regulatorFamily,
+        regulatorName: regulons[0].regulatorName,
+        regulatorType: regulons[0].regulationType,
+        selectable: false,
+        targetGenes: []
+    }
+
+    for (let i = 0; i < resultingMatrix.length; i++) {
+        if (resultingMatrix[i] == '1') result.targetGenes.push(uniqueGenesByName[i]);
+    }
+
+    regulogNetwork.regulons.push(result);
+
+    drawWagonWheel(result, $("#graph #body"));
 }
 
 /**

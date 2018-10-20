@@ -44,11 +44,21 @@ block content
                         .item(data-value="function") Function
                         .item(data-value="go-term") GO Term
 
-                .right.item
-                    .ui.large.basic.right.floated.icon.buttons
-                        btn.ui.button#btn-zoom-out
-                            i.zoom-out.icon
-                        btn.ui.button#btn-zoom-in
-                            i.zoom-in.icon
+                .right.menu
+                    .ui.dropdown.item Compare
+                        i.dropdown.icon
+                        .menu
+                            .item#btn-compare-and AND
+                            .item#btn-compare-or OR
+                            .item#btn-compare-xor XOR
+                    .item
+                        .ui.large.basic.icon.buttons
+                            button.ui.button#btn-zoom-out
+                                i.zoom-out.icon
+                            button.ui.button#btn-zoom-in
+                                i.zoom-in.icon
         #goterm-legend
         #body.ui.cards(style="clear:both")
+
+    script.
+        $("#graph #header .right.menu .dropdown.item").dropdown();
