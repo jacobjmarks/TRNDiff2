@@ -297,39 +297,36 @@ function compareSelected(method) {
 
     let binaryGeneMatrix = regulons.map((r) => r.regulonId).map((rId) => regulogNetwork.binaryGeneMatrix[rId]);
 
-    let resultingMatrix = binaryGeneMatrix[0].split('');
-    let determined = 0;
+    let resultingMatrix = '0'.repeat(uniqueGenes.length).split('');
 
-    for (let i = 1; i < binaryGeneMatrix.length; i++) {
-        for (let j = determined; j < binaryGeneMatrix[i].length; j++) {
+    for (let i = 0; i < resultingMatrix.length; i++) {
+        let set = false;
+        for (let j = 1; j < binaryGeneMatrix.length; j++) {
             switch (method) {
                 case "AND":
-                    if (resultingMatrix[j] == '1' && binaryGeneMatrix[i][j] == '1') {
-                        continue;
+                    if (binaryGeneMatrix[0][i] == '1' && binaryGeneMatrix[j][i] == '1') {
+                        resultingMatrix[i] = '1';
                     } else {
-                        resultingMatrix[j] = '0';
-                        determined++;
+                        resultingMatrix[i] = '0';
+                        set = true;
                     }
-                    continue;
+                    break;
                 case "OR":
-                    if (resultingMatrix[j] == '1') continue;
-                    if (binaryGeneMatrix[i][j] == '1') {
-                        resultingMatrix[j] = '1';
-                        determined++;
-                        continue;
+                    if (binaryGeneMatrix[0][i] == '1' || binaryGeneMatrix[j][i] == '1') {
+                        resultingMatrix[i] = '1';
+                        set = true;
                     }
-                    continue;
+                    break;
                 case "XOR":
-                    if (resultingMatrix[j] != binaryGeneMatrix[i][j]) {
-                        resultingMatrix[j] = '1';
-                    } else {
-                        resultingMatrix[j] = '0';
+                    if (binaryGeneMatrix[0][i] != binaryGeneMatrix[j][i]) {
+                        resultingMatrix[i] = '1';
+                        set = true;
                     }
-                    determined++;
-                    continue;
+                    break;
                 default:
-                    continue;
+                    break;
             }
+            if (set) break;
         }
     }
 
