@@ -96,6 +96,7 @@ function drawWagonWheels() {
     graph.empty();
 
     for (let regulon of regulons) {
+        regulon.selectable = true;
         drawWagonWheel(regulon, graph);
     }
 
@@ -117,6 +118,26 @@ function drawWagonWheel(regulon, div) {
         .addClass("ui card")
         .addClass("wagonwheel")
         .width(svgDivSize)
+
+    if (regulon.selectable) {
+        svgDiv
+            .on("mouseover", function() { $(this).css("cursor", "pointer"); })
+            .on("mouseout", function() { $(this).css("cursor", "inherit"); })
+            .click(function() {
+                let div = $(this);
+                if (!div.hasClass("active")) {
+                    div.addClass("active");
+                    div.append(
+                        $("<div>").addClass("ui right corner green label").append(
+                            $("<i>").addClass("check icon")
+                        )
+                    )
+                } else {
+                    div.removeClass("active");
+                    div.find(".label").remove();
+                }
+            })
+    }
 
     if (regulon.regulonId == regulogNetwork["selected-regulon"]) {
         svgDiv.css("border", "1px solid blue");
@@ -252,6 +273,8 @@ function drawWagonWheel(regulon, div) {
     svg.append(centroid);
 
     div.append(svgDiv);
+
+    $(".gene-node, .centroid, .centroid-margin").hover(function(e) { e.stopPropagation() });
 }
 
 /**
