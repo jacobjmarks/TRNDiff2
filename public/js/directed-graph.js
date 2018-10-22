@@ -3,7 +3,7 @@ $(document).ready(() => {
 
     graph.height(Math.max(500, $(document).height() - graph.offset().top - 15));
 
-    let nodes = [];
+    nodes = [];
     
     tfNetwork.forEach(r => {
         if (nodes.find(n => n.id == r.regulonId)) return;
@@ -13,7 +13,7 @@ $(document).ready(() => {
         })
     });
 
-    let edges = [];
+    edges = [];
 
     tfNetwork.forEach(r => {
         r.targetRegulators.forEach(tr => {
@@ -35,3 +35,29 @@ $(document).ready(() => {
 
     network = new vis.Network(graph[0], data, options);
 })
+
+function toggleSelfRegulatedNodes(isVisible) {
+    let updates = [];
+
+    for (let node of nodes) {
+        let connectedEdges = network.getConnectedEdges(node.id);
+        if (connectedEdges.length == 1) {
+            let edge = network.body.data.edges.get(connectedEdges[0]);
+            if (edge.from == edge.to) updates.push({id: node.id, hidden: !isVisible, physics: isVisible});
+        }
+    }
+
+    network.body.data.nodes.update(updates);
+}
+
+function toggleLonelyNodes(isVisible) {
+    let updates = [];
+
+    for (let node of nodes) {
+        if (network.getConnectedEdges(node.id).length == 0) {
+            updates.push({id: node.id, hidden: !isVisible, physics: isVisible});
+        }
+    }
+
+    network.body.data.nodes.update(updates);
+}
