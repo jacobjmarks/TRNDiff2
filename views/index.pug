@@ -1,1 +1,77 @@
 extends layout
+
+block content
+    .ui.basic.large.segment
+        .ui.header Introduction
+        .text
+            | TRNDiff is a node.js app which exists to support visual comparison of transcriptional
+            | relationships across dozens or even hundreds of organisms. We use a simple, compact
+            | 'wagon wheel' representation of the Transcriptional Regulatory Network (TRN), centred
+            | on a single Transcription Factor (TF). Here the wagon wheel hub is the TF, and the
+            | possible target genes (TGs) appear as nodes on the wheel rim. A regulatory
+            | relationship is shown by a spoke between the hub and the node.
+
+    .ui.basic.large.segment
+        .ui.header Quick Start
+        .ui.three.stackable.cards
+            .blue.card: .content
+                .ui.small.centered.header Step 1: Choose a data source
+                .text
+                    | There are two options:
+                    br
+                    ul.ui.ordered.list(style="margin-left: 35px")
+                        li.item RegPrecise: Browse the <b>RegPrecise</b> database by <b>Genome</b>
+                        li.item.disabled Local File: upload local data
+            .blue.card: .content
+                .ui.small.centered.header Step 2: Select a Regulon
+                .text
+                    | Applicable to the RegPrecise database only. Follow the substeps to drill down
+                    | the collection for browsing.
+                    br
+                    ul.ui.ordered.list(style="margin-left: 35px")
+                        li.item <b>Select Genome</b> from the table
+                        li.item <b>Select Regulon</b> for the chosen genome
+                        li.item <b>View Regulog</b> will show the 'wagon wheels'
+            .card: .content
+                .ui.small.centered.header Other Features
+                .text
+                    | There are also other functions available with TRNDiff:
+                    br
+                    ul.ui.list(style="margin-left: 35px")
+                        li.item Highlight by functional GO terms
+                        li.item Binary comparisons
+                        li.item Clustering
+
+    .ui.basic.large.segment
+        .ui.header About RegPrecise
+        .text
+            | RegPrecise [
+            a(href="http://regprecise.lbl.gov/RegPrecise/") http://regprecise.lbl.gov/RegPrecise/
+            | ] is a repository of high-quality reference data which captures the regulatory
+            | relationships between genes in 390 prokaryote genomes. The database contains manually
+            | curated details of genes, transcription factors and transcription factor binding
+            | sites which have been obtained by careful comparative genomic analysis,
+            | experimentation and literature review as outlined in the paper:
+
+            .ui.message
+                | Pavel S. Novichkov, Olga N. Laikova, Elena S. Novichkova, Mikhail S. Gelfand,
+                | Adam P. Arkin, Inna Dubchak, and Dmitry A. Rodionov (2010) 
+                a(href="http://www.ncbi.nlm.nih.gov/pubmed/19884135")
+                    | RegPrecise: a database of curated genomic inferences of transcriptional
+                    | regulatory interactions in prokaryotes. 
+                | Nucleic Acids Res. 2010 January; 38(Database issue): D111–D118.
+            
+            | TRNDiff is intended to provide an easy way to browse the RegPrecise database, locate
+            | a regulog of interest, and view the regulons belonging to the regulog. Any regulog
+            | can be saved to the desktop in CSV format, and these files can be edited and then
+            | reloaded into the program to view the results.
+            br
+            br
+            | Future versions of this application will provide further integration of TRNDiff and
+            | RegPrecise with standard tools such as NCBI BLAST to allow users to execute more powerful workflows.
+
+    .ui.basic.large.segment
+        .ui.header Contact us
+        .text
+            | Please direct any enquiries to the project leader, James Hogan, at 
+            a(href="mailto:j.hogan@qut.edu.au") j.hogan@qut.edu.au
