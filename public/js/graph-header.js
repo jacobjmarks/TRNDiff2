@@ -1,6 +1,26 @@
 $(document).ready(() => {
     $("#sort-regulons-by.dropdown").dropdown({
         onChange: (value) => {
+            if (value.includes("kmeans")) {
+                let k = value[value.length - 1];
+                $.ajax({
+                    method: "POST",
+                    url: "kmeanscluster",
+                    dataType: "json",
+                    data: {
+                        data: regulogNetwork.binaryGeneMatrix,
+                        k: k
+                    },
+                    success: (data) => {
+                        drawClusteredWagonWheels(data);
+                    },
+                    error: () => {
+                        alert("An error has occurred.");
+                    }
+                })
+                return;
+            }
+
             regulogNetwork.regulons.sort((a, b) => {
                 switch(value) {
                     case "hamming-distance":

@@ -24,6 +24,8 @@ gotermZip.extractAllTo("./db/go/");
 
 const goTerms = JSON.parse(fs.readFileSync("./db/go/rp-gene-terms.json"));
 
+const kmeans = require('node-kmeans');
+
 module.exports.genomes = (filter, cb) => {
     cb(null, db.genomes.filter(filter));
 }
@@ -103,6 +105,18 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
     network.regulons = network.regulons.sort((a, b) => a.hammingDist - b.hammingDist);
 
     cb(null, network);
+}
+
+module.exports.kMeansCluster = (binaryGeneMatrix, k, cb) => {
+    let vectors = [];
+
+    for (let key of Object.keys(binaryGeneMatrix)) {
+        vectors.push(binaryGeneMatrix[key].split(''));
+    }
+
+    kmeans.clusterize(vectors, {k: k}, (err, res) => {
+        cb(err, res ? res.map(c => c.clusterInd.map(i => Object.keys(binaryGeneMatrix)[i])) : null);
+    })
 }
 
 function generateBinaryGeneMatrix(geneNames, regulons) {

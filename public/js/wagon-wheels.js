@@ -348,6 +348,23 @@ function compareSelected(method) {
     drawWagonWheel(result, $("#graph #body"));
 }
 
+function drawClusteredWagonWheels(clusters) {
+    let div = $("#graph #body");
+    div.empty();
+    for (let i = 0; i < clusters.length; i++) {
+        let clusterDiv = $("<div>").addClass("card");
+        clusterDiv.append(
+            $("<div>").addClass("ui centered header")
+                .css("margin", "10px 10px 0px 10px")
+                .text(`Cluster ${i+1}`)
+        );
+        for (let rId of clusters[i]) {
+            drawWagonWheel(regulons.find(r => r.regulonId == rId), clusterDiv);
+        }
+        div.append(clusterDiv);
+    }
+}
+
 /**
  * Adds an entry for the given term in the GO
  * Term color legend if it does not yet exist.

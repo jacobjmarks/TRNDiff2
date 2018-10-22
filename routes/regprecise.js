@@ -60,6 +60,13 @@ router.get("/graph", (req, res) => {
     })
 });
 
+router.post("/kmeanscluster", (req, res) => {
+    regprecise.kMeansCluster(req.body.data, req.body.k, (err, result) => {
+        if (err) { console.error(err); return res.status(500).end(); }
+        res.json(result);
+    })
+})
+
 function generateFilter(reqQuery) {
     let keys = Object.keys(reqQuery);
     if (!keys.length) return r => true;

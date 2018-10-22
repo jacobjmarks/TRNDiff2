@@ -11,8 +11,10 @@
   "license": "ISC",
   "dependencies": {
     "adm-zip": "^0.4.11",
+    "body-parser": "^1.18.3",
     "express": "^4.16.3",
     "fast-levenshtein": "^2.0.6",
+    "node-kmeans": "^1.1.8",
     "pug": "^2.0.3",
     "request": "^2.87.0",
     "soap": "^0.25.0"

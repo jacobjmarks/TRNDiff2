@@ -1,11 +1,12 @@
 const express = require("express");
 const app = express();
-const pug = require("pug");
-const fs = require("fs");
+const bodyParser = require("body-parser");
 
 const PORT = 3000;
 
 app.use(express.static("public"));
+app.use(express.urlencoded({extended: true}));
+app.use(bodyParser.json());
 
 app.use("/", require("./routes/index.js"));
 app.use("/regprecise", require("./routes/regprecise.js"));
