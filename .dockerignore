@@ -1,2 +1,2 @@
-public/js/pug-templates.js
 node_modules
+db/**/*.json
