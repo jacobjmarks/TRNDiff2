@@ -37,10 +37,26 @@ $(document).ready(() => {
     }
 
     let options = {
-
+        interaction: {
+            hover: true
+        }
     }
 
     network = new vis.Network(graph[0], data, options);
+
+    // Node onclick -> View Regulog graph
+    network.on("click", function(e) {
+        if (e.nodes.length == 0) return;
+        location.href = `/regprecise/graph?regulonId=${tfNetwork.find(r => r.regulatorName.toLowerCase() == e.nodes[0]).regulonId}`;
+    })
+
+    network.on("hoverNode", function(e) {
+        document.body.style.cursor = "pointer";
+    })
+
+    network.on("blurNode", function(e) {
+        document.body.style.cursor = "default";
+    })
 })
 
 function toggleSelfRegulatedNodes(isVisible) {
