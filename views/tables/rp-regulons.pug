@@ -26,12 +26,12 @@ block content
 
     #graph-or-table
         .ui.pointing.two.item.secondary.menu
-            a.item(data-tab="regulator-graph").active Regulator Graph
+            a.item(data-tab="regulator-graph") Regulator Graph
             a.item(data-tab="regulon-table") Regulon Table
         .ui.tab(data-tab="regulator-graph")
             #directed-graph
                 #header
-                #body(style="width:100%;height:500px")
+                #body(style="width:100%")
         .ui.tab(data-tab="regulon-table")
             table.ui.single.line.compact.sortable.selectable.table
                 thead
@@ -53,4 +53,5 @@ block content
                             td= regulon.effector
 
     script.
-        $("#graph-or-table .menu a.item").tab();
+        $("#directed-graph #body").css("height", Math.max(500, $(window).height() - $("#directed-graph #body").position().top - 235))
+        $("#graph-or-table .menu a.item").tab("change tab", "regulator-graph");
