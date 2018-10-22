@@ -23,7 +23,7 @@ $(document).ready(() => {
     $("body").append(tooltip = $("<tooltip>")
         .addClass("ui segment")
         .css("position", "absolute")
-        .css("z-index", 10)
+        .css("z-index", 1000)
         .css("visibility", "hidden")
         .css("padding", "10px")
         .css("background-color", "rgba(255,255,255,0.75)"))
@@ -337,9 +337,9 @@ function compareSelected(method) {
         if (resultingMatrix[i] == '1') result.targetGenes.push(uniqueGenesByName[i]);
     }
 
-    regulogNetwork.regulons.push(result);
-
-    drawWagonWheel(result, ($("#graph").width() - (svgDivMargin * columns)) / columns, $("#graph #body"));
+    $("#graph-dimmer .content").empty();
+    $("#graph-dimmer").dimmer({closable: true}).dimmer("show");
+    drawWagonWheel(result, Math.min(750, $(window).width() * 0.6), $("#graph-dimmer .content"));
 }
 
 function drawClusteredWagonWheels(clusters) {
