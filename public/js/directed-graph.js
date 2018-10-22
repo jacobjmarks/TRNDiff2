@@ -1,5 +1,7 @@
-$(document).ready(() => {
-    graph = $("#directed-graph #body")[0];
+$(document).ready(() => {    
+    graph = $("#directed-graph #body");
+
+    graph.height(Math.max(500, $(document).height() - graph.offset().top - 15));
 
     let nodes = [];
     
@@ -31,5 +33,5 @@ $(document).ready(() => {
 
     }
 
-    network = new vis.Network(graph, data, options);
+    network = new vis.Network(graph[0], data, options);
 })
