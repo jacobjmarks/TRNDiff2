@@ -1,4 +1,11 @@
-$(document).ready(() => {    
+$(document).ready(() => {
+    $("#directed-graph #header #hide-unregulated.checkbox").checkbox({
+        onChange: function() { toggleLonelyNodes(!this.checked) }
+    });
+    $("#directed-graph #header #hide-self-regulated.checkbox").checkbox({
+        onChange: function() { toggleSelfRegulatedNodes(!this.checked) }
+    });
+
     graph = $("#directed-graph #body");
 
     graph.height(Math.max(500, $(document).height() - graph.offset().top - 15));

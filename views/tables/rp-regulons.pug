@@ -31,6 +31,17 @@ block content
         .ui.tab(data-tab="regulator-graph")
             #directed-graph
                 #header
+                    .ui.stackable.secondary.menu
+                        .item: .ui.checkbox#hide-unregulated
+                            input(type="checkbox")
+                            label Hide unregulated TFs
+                        script.
+                            $("#directed-graph #header #hide-unregulated.checkbox").checkbox({onChange: function() {}});
+                        .item: .ui.checkbox#hide-self-regulated
+                            input(type="checkbox")
+                            label Hide self-regulated TFs
+                        script.
+                            $("#directed-graph #header #hide-self-regulated.checkbox").checkbox();
                 #body(style="width:100%")
         .ui.tab(data-tab="regulon-table")
             table.ui.single.line.compact.sortable.selectable.table
