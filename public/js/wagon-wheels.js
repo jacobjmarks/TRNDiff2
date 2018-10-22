@@ -60,8 +60,7 @@ function svgElem(tag) {
 function drawWagonWheels() {
     $("#graph").show();
     svgDivMargin = 14;
-    svgDivSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
-    svgSize = svgDivSize;
+    let svgSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
 
     regulons = regulogNetwork.regulons;
 
@@ -80,38 +79,17 @@ function drawWagonWheels() {
         uniqueGenesByName = [...uniqueGenes].sort((a, b) => a.name.localeCompare(b.name));
     }
 
-    spokeLength = svgSize * 0.75;
-    spokeAngle = 360 / uniqueGenes.length;
-
-    origin = {
-        x: svgSize / 2,
-        y: svgSize / 2
-    }
-
-    geneNodeRadius = Math.min(spokeLength/2 * toRadians(spokeAngle) / 2, 10);
-    geneNodePositions = (() => {
-        let positions = {};
-        uniqueGenes.map(g => g.name).forEach((name, i) => {
-            let angle = toRadians((270 + spokeAngle * i) % 360);
-            positions[name] = {
-                x: svgSize / 2 + Math.cos(angle) * spokeLength/2,
-                y: svgSize / 2 + Math.sin(angle) * spokeLength/2
-            }
-        })
-        return positions;
-    })();
-
     let graph = $("#graph #body");
     graph.empty();
 
     for (let regulon of regulons) {
         if (!Object.keys(regulon).includes("selectable")) regulon.selectable = true;
-        drawWagonWheel(regulon, graph);
+        drawWagonWheel(regulon, svgSize, graph);
     }
 
     // Redraw if available width has changed after drawing
     // (usually due to scrollbar popin)
-    if ($("#graph").width() < (svgDivSize + svgDivMargin) * columns) {
+    if ($("#graph").width() < (svgSize + svgDivMargin) * columns) {
         drawWagonWheels();
     }
 }
@@ -122,12 +100,28 @@ function drawWagonWheels() {
  * @param {JSON} regulon Regulon for which to graph
  * @param {Element} div HTML element to append wagonwheel
  */
-function drawWagonWheel(regulon, div) {
+function drawWagonWheel(regulon, svgSize, div) {
     let svgDiv = $("<div>")
         .addClass("ui card")
         .addClass("wagonwheel")
-        .width(svgDivSize)
+        .width(svgSize)
         .data("regulon-data", regulon)
+
+    let spokeLength = svgSize * 0.75;
+    let spokeAngle = 360 / uniqueGenes.length;
+    
+    let geneNodeRadius = Math.min(spokeLength/2 * toRadians(spokeAngle) / 2, 10);
+    let geneNodePositions = (() => {
+        let positions = {};
+        uniqueGenes.map(g => g.name).forEach((name, i) => {
+            let angle = toRadians((270 + spokeAngle * i) % 360);
+            positions[name] = {
+                x: svgSize / 2 + Math.cos(angle) * spokeLength/2,
+                y: svgSize / 2 + Math.sin(angle) * spokeLength/2
+            }
+        })
+        return positions;
+    })();
 
     if (regulon.selectable) {
         svgDiv
@@ -175,8 +169,8 @@ function drawWagonWheel(regulon, div) {
         let spoke = $(svgElem("line"))
             .addClass(`gene-spoke gene-${gene.name}`)
             .attr({
-                "x1": origin.x,
-                "y1": origin.y,
+                "x1": svgSize / 2,
+                "y1": svgSize / 2,
                 "x2": to.x,
                 "y2": to.y,
                 "stroke-width": 2,
@@ -345,7 +339,7 @@ function compareSelected(method) {
 
     regulogNetwork.regulons.push(result);
 
-    drawWagonWheel(result, $("#graph #body"));
+    drawWagonWheel(result, ($("#graph").width() - (svgDivMargin * columns)) / columns, $("#graph #body"));
 }
 
 function drawClusteredWagonWheels(clusters) {
@@ -358,10 +352,10 @@ function drawClusteredWagonWheels(clusters) {
                 .css("margin", "10px 10px 0px 10px")
                 .text(`Cluster ${i+1}`)
         );
-        for (let rId of clusters[i]) {
-            drawWagonWheel(regulons.find(r => r.regulonId == rId), clusterDiv);
-        }
         div.append(clusterDiv);
+        for (let rId of clusters[i]) {
+            drawWagonWheel(regulons.find(r => r.regulonId == rId), $(clusterDiv).width(), clusterDiv);
+        }
     }
 }
 
