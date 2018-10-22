@@ -6,7 +6,7 @@ $(document).ready(() => {
     let nodes = [];
     
     tfNetwork.forEach(r => {
-        if (nodes.find(n => n.id == r.regulonId)) return;
+        if (nodes.find(n => n.id == r.regulatorName.toLowerCase())) return;
         nodes.push({
             id: r.regulatorName.toLowerCase(),
             label: r.regulatorName
