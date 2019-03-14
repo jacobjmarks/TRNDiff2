@@ -33,10 +33,10 @@ block content
                     .menu
                         .item(data-value="hamming-distance").active.selected Hamming Distance
                         .item(data-value="levenstein-distance") Levenstein Distance
-                        .item(data-value="kmeans-1") KMeans Cluster (K1)
-                        .item(data-value="kmeans-2") KMeans Cluster (K2)
-                        .item(data-value="kmeans-3") KMeans Cluster (K3)
-                        .item(data-value="kmeans-4") KMeans Cluster (K4)
+                        //-.item(data-value="kmeans-1") KMeans Cluster (K1)
+                        //-.item(data-value="kmeans-2") KMeans Cluster (K2)
+                        //-.item(data-value="kmeans-3") KMeans Cluster (K3)
+                        //-.item(data-value="kmeans-4") KMeans Cluster (K4)
                         .item(data-value="gene-count") Gene Count
                         .item(data-value="genome-name") Genome Name
                 .ui.item Sort Genes By:
@@ -47,6 +47,19 @@ block content
                         .item(data-value="name").active.selected Name
                         .item(data-value="function") Function
                         .item(data-value="go-term") GO Term
+                        
+                .ui.item Cluster Regulons By:
+                .ui.item.dropdown#cluster-regulons-by
+                    .text No Clustering
+                    i.dropdown.icon
+                    .menu
+                        .item(data-value="name").active.selected No Clustering
+                        .item(data-value="kmeans-1") KMeans Cluster (K1)
+                        .item(data-value="kmeans-2") KMeans Cluster (K2)
+                        .item(data-value="kmeans-3") KMeans Cluster (K3)
+                        .item(data-value="kmeans-4") KMeans Cluster (K4)
+                        
+                a.right.item(onclick="generateCSV()") Save To CSV
 
                 .right.menu
                     .ui.dropdown.item Compare

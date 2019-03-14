@@ -1,4 +1,4 @@
-let columns = 4;
+//let columns = 4;
 
 let geneSortFunc = (a, b) => a.name.localeCompare(b.name);
 
@@ -19,6 +19,24 @@ const goTermColors = {
     "hijacked molecular function":      "#33a02c"
 };
 
+// Colour used for genes that have a GO term not in the above list
+const UNKNOWN_GO_TERM_COLOUR = "#666666";
+
+// Sizes in pixels for zooming
+const DEFAULT_SIZE = 300;
+const ZOOM_INCREMENT = 50;
+const MIN_SIZE = 100;
+const MAX_SIZE = 1000;
+
+// The current size of each wagon wheel
+let currentSize = DEFAULT_SIZE;
+
+// The number of wagon wheel graphs currently in the display
+let numGraphs = 0;
+
+// The lists of the current clusters in the display
+let currentClusters = -1;
+
 $(document).ready(() => {
     $("body").append(tooltip = $("<tooltip>")
         .addClass("ui segment")
@@ -31,17 +49,30 @@ $(document).ready(() => {
         drawWagonWheels();
 
         $(window).resize(() => {
-            if ($("#graph #body").html()) drawWagonWheels()
+            //if ($("#graph #body").html()) drawWagonWheels()
+            if ($("#graph #body").html() && currentClusters != - 1) {
+                drawClusteredWagonWheels(currentClusters)
+            }
         })
         
         $("#btn-zoom-out").click(() => {
-            columns++;
-            drawWagonWheels()
+            //columns++;
+            if (currentSize > MIN_SIZE) currentSize = currentSize - ZOOM_INCREMENT;
+            if (currentClusters != - 1) {
+                drawClusteredWagonWheels(currentClusters)
+            } else {
+                drawWagonWheels()
+            }
         })
         
         $("#btn-zoom-in").click(() => {
-            if (columns > 1) columns--;
-            drawWagonWheels()
+            //if (columns > 1) columns--;
+            if (currentSize < MAX_SIZE) currentSize = currentSize + ZOOM_INCREMENT;
+            if (currentClusters != - 1) {
+                drawClusteredWagonWheels(currentClusters)
+            } else {
+                drawWagonWheels()
+            }
         })
 
         $("#btn-compare-and").click(() => { compareSelected("AND") })
@@ -58,26 +89,18 @@ function svgElem(tag) {
 }
 
 function drawWagonWheels() {
+    
+    numGraphs = 0;
+    currentClusters = -1;
+    
     $("#graph").show();
     svgDivMargin = 14;
-    let svgSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
+    //let svgSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
+    let svgSize = currentSize;
 
     regulons = regulogNetwork.regulons;
 
-    uniqueGenes = regulons
-                    .map(r => r.targetGenes)
-                    .reduce((a, b) => a.concat(b), [])
-                    .reduce((a, b) => {
-                        if (!a.find(g => g.name == b.name)) {
-                            a.push(b);
-                        }
-                        return a;
-                    }, [])
-                    .sort(geneSortFunc)
-
-    if (!window.uniqueGenesByName) {
-        uniqueGenesByName = [...uniqueGenes].sort((a, b) => a.name.localeCompare(b.name));
-    }
+    sortGenes();
 
     let graph = $("#graph #body");
     graph.empty();
@@ -89,9 +112,9 @@ function drawWagonWheels() {
 
     // Redraw if available width has changed after drawing
     // (usually due to scrollbar popin)
-    if ($("#graph").width() < (svgSize + svgDivMargin) * columns) {
-        drawWagonWheels();
-    }
+    //if ($("#graph").width() < (svgSize + svgDivMargin) * columns) {
+    //    drawWagonWheels();
+    //}
 }
 
 /**
@@ -100,8 +123,10 @@ function drawWagonWheels() {
  * @param {JSON} regulon Regulon for which to graph
  * @param {Element} div HTML element to append wagonwheel
  */
-function drawWagonWheel(regulon, svgSize, div) {
-    let svgDiv = $("<div>")
+function drawWagonWheel(regulon, svgSize, div) {        
+    numGraphs++;
+    
+    let svgDiv = $("<div>", {id: "graph" + numGraphs})
         .addClass("ui card")
         .addClass("wagonwheel")
         .width(svgSize)
@@ -162,7 +187,7 @@ function drawWagonWheel(regulon, svgSize, div) {
     for (let gene of regulon.targetGenes) {
         let to = geneNodePositions[gene.name];
 
-        let color = goTermColors[gene.term];
+        let color = goTermColors[gene.term] ? goTermColors[gene.term] : UNKNOWN_GO_TERM_COLOUR;
 
         updateGoTermLegend(gene.term);
 
@@ -339,22 +364,45 @@ function compareSelected(method) {
 
     $("#graph-dimmer .content").empty();
     $("#graph-dimmer").dimmer({closable: true}).dimmer("show");
-    drawWagonWheel(result, Math.min(750, $(window).width() * 0.6), $("#graph-dimmer .content"));
+    
+    // Added a height restriction as well, so that it is not cut off at the top and bottom
+    drawWagonWheel(result, Math.min(750, $(window).width() * 0.6, $(window).height() * 0.8), $("#graph-dimmer .content"));
 }
 
 function drawClusteredWagonWheels(clusters) {
+    
+    numGraphs = 0;
+    if (currentClusters != clusters) {
+        currentClusters = clusters;
+    }
+    
+    sortGenes();
+    
     let div = $("#graph #body");
     div.empty();
     for (let i = 0; i < clusters.length; i++) {
-        let clusterDiv = $("<div>").addClass("card");
+        let clusterDiv = 
+        $("<div>").addClass("card")
+        .width(Math.max(currentSize, (($("#graph #body").width() - (clusters.length * 28)) / clusters.length)));
+        
         clusterDiv.append(
             $("<div>").addClass("ui centered header")
-                .css("margin", "10px 10px 0px 10px")
+                .css("margin", "10px 10px 10px 10px")
                 .text(`Cluster ${i+1}`)
         );
+        
+        // Now adding a second div so that clustered wagon wheels can appear
+        // side by side
+        let clusterDiv2 = 
+        $("<div>").addClass("ui cards centered")
+        .css("clear", "both");
+        
+        clusterDiv.append(clusterDiv2);
+        
         div.append(clusterDiv);
         for (let rId of clusters[i]) {
-            drawWagonWheel(regulons.find(r => r.regulonId == rId), $(clusterDiv).width(), clusterDiv);
+            //drawWagonWheel(regulons.find(r => r.regulonId == rId), $(clusterDiv).width(), clusterDiv);
+            drawWagonWheel(regulons.find(r => r.regulonId == rId), currentSize, clusterDiv2);
         }
     }
 }
@@ -377,7 +425,7 @@ function updateGoTermLegend(term) {
         let label = $("<a>").addClass("ui large label").attr("id", term)
             .append(
                 $("<i>").addClass("square icon")
-                    .css("color", goTermColors[term])
+                    .css("color", goTermColors[term] ? goTermColors[term] : UNKNOWN_GO_TERM_COLOUR)
             )
             .append(term)
             .click(() => {
@@ -404,4 +452,26 @@ function highlightTerm(term, opacity) {
             $(`svg line.gene-spoke.gene-${gene.name}`).css("opacity", opacity);
         };
     })
+}
+
+
+/**
+  * Sort all genes in the current set of regulons based on the current gene
+  * sort function
+  */
+function sortGenes() {
+    uniqueGenes = regulons
+                    .map(r => r.targetGenes)
+                    .reduce((a, b) => a.concat(b), [])
+                    .reduce((a, b) => {
+                        if (!a.find(g => g.name == b.name)) {
+                            a.push(b);
+                        }
+                        return a;
+                    }, [])
+                    .sort(geneSortFunc)
+
+    if (!window.uniqueGenesByName) {
+        uniqueGenesByName = [...uniqueGenes].sort((a, b) => a.name.localeCompare(b.name));
+    }
 }

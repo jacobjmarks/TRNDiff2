@@ -103,6 +103,19 @@ module.exports.getRegulogNetwork = (regulonId, cb) => {
     network.binaryGeneMatrix = binaryGeneMatrix;
 
     network.regulons = network.regulons.sort((a, b) => a.hammingDist - b.hammingDist);
+    
+    // Adding these for access purposes
+    network["regulog"] = db.regulogs.find(r => r.regulogId == regulon.regulogId);
+    network["regulators"] = [];
+    network["genomes"] = [];
+    for (let regulon of network["regulons"]) {
+        for (let regulator of db.regulators.filter(r => r.regulonId == regulon.regulonId)) {
+            network.regulators.push(regulator);
+        }
+        for (let genome of db.genomes.filter(g => g.genomeId == regulon.genomeId)) {
+            network.genomes.push(genome);
+        }
+    }
 
     cb(null, network);
 }

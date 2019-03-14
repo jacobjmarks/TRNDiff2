@@ -184,6 +184,19 @@ router.post("/", (req, res) => {
                 network.binaryGeneMatrix = binaryGeneMatrix;
 
                 network.regulons = network.regulons.sort((a, b) => a.hammingDist - b.hammingDist);
+    
+                // Adding these for access purposes
+                network["regulog"] = regulogs.find(r => r.regulogId == regulons[0].regulogId);
+                network["regulators"] = [];
+                network["genomes"] = [];
+                for (let regulon of network["regulons"]) {
+                    for (let regulator of regulators.filter(r => r.regulonId == regulon.regulonId)) {
+                        network.regulators.push(regulator);
+                    }
+                    for (let genome of genomes.filter(g => g.genomeId == regulon.genomeId)) {
+                        network.genomes.push(genome);
+                    }
+                }
                 
                 console.log("Attempting to render CSV records as wagon wheels...");
                 res.render("wagon-wheels.pug", { network: network });

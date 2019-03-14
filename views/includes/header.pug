@@ -1,3 +1,6 @@
+//-block scripts
+//-    script(src="/js/local-load.js")
+
 .ui.secondary.stackable.large.menu(style="margin-bottom:0")
     .ui.huge.header
         a.ui.huge.image(href="http://qut.edu.au/" target="_blank")
@@ -7,4 +10,13 @@
             .sub.header Queensland University of Technology
     .right.menu
         a.item(href="/regprecise/genomes") REGPRECISE
-        a.item.disabled UPLOAD
+        
+        //- Enabled this link and set it to trigger an invisible file input
+        //- https://stackoverflow.com/questions/16215771/how-open-select-file-dialog-via-js
+        a.item(onclick="document.getElementById('fileInput').click();") UPLOAD
+        
+        //- Invisible file input that should try to read CSV files
+        form(action="/local/" method="post" enctype="multipart/form-data")
+            //-input#fileInput(type="file" style="display: none;" onchange="loadlocal(value);")
+            input#fileInput(type="file" name="fileInput" style="display: none;" onchange="document.getElementById('fileSubmit').click();")
+            input#fileSubmit(type="submit" style="display: none;" )

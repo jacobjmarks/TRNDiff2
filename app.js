@@ -11,6 +11,7 @@ app.use(bodyParser.json());
 app.use("/", require("./routes/index.js"));
 app.use("/regprecise", require("./routes/regprecise.js"));
 app.use("/regulondb", require("./routes/regulondb.js"));
+app.use("/local", require("./routes/local.js"));
 
 app.listen(PORT, () => {
     console.debug("Server listening on port " + PORT);
