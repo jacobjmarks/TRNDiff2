@@ -46,7 +46,21 @@ $(document).ready(() => {
         .css("padding", "10px")
         .css("background-color", "rgba(255,255,255,0.75)"))
 
-        drawWagonWheels();
+        // Moving some initial stuff to up here out of drawWagonWheels() since
+        // we can potentially go to drawClusteredWagonWheels() first
+        $("#graph").show();
+        
+        // Make a variable for the regulons so they are easier to access
+        regulons = regulogNetwork.regulons;
+        
+        if (regulogNetwork.clusters != null) {
+            drawClusteredWagonWheels(regulogNetwork.clusters);
+            
+            // Delete the temporary clusters property
+            delete regulogNetwork.clusters;
+        } else {
+            drawWagonWheels();
+        }
 
         $(window).resize(() => {
             //if ($("#graph #body").html()) drawWagonWheels()
@@ -93,12 +107,12 @@ function drawWagonWheels() {
     numGraphs = 0;
     currentClusters = -1;
     
-    $("#graph").show();
-    svgDivMargin = 14;
+    //$("#graph").show();
+    //svgDivMargin = 14;
     //let svgSize = ($("#graph").width() - (svgDivMargin * columns)) / columns;
-    let svgSize = currentSize;
+    //let svgSize = currentSize;
 
-    regulons = regulogNetwork.regulons;
+    //regulons = regulogNetwork.regulons;
 
     sortGenes();
 
@@ -107,7 +121,7 @@ function drawWagonWheels() {
 
     for (let regulon of regulons) {
         if (!Object.keys(regulon).includes("selectable")) regulon.selectable = true;
-        drawWagonWheel(regulon, svgSize, graph);
+        drawWagonWheel(regulon, currentSize, graph);
     }
 
     // Redraw if available width has changed after drawing

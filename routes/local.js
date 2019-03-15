@@ -16,15 +16,15 @@ router.post("/", (req, res) => {
     // Do things if there is a file present
     form.parse(req)
     .on('file', (name, file) => {
-        //console.log('Uploaded file', name, file);
+        ////console.log('Uploaded file', name, file);
         
         // First check if the MIME type is correct
         // Excel is counted because CSV created in Excel can have an Excel MIME
         // type
         if (file.type.includes(MIME_CSV) ||  file.type.includes(MIME_EXCEL)) {
-            console.log("MIME type indicates this is a CSV or Excel file")
+            //console.log("MIME type indicates this is a CSV or Excel file")
         } else {
-            console.log("MIME type indicates this is not a CSV or Excel file")
+            //console.log("MIME type indicates this is not a CSV or Excel file")
             res.writeHead(200, {'Content-Type': 'text/html'});
             res.write("You did not upload a CSV file!");
             res.end();
@@ -32,16 +32,16 @@ router.post("/", (req, res) => {
         }
       
         // If it is, try to parse it
-        console.log('Attempting to read file...');
+        //console.log('Attempting to read file...');
         fs.readFile(file.path, function(err, data) {
             if (err) throw err;
-            console.log('File read');
-            console.log('Attempting to parse CSV...');
+            //console.log('File read');
+            //console.log('Attempting to parse CSV...');
             try {
                 // Try to parse the data as a string into a CSV array using
                 // jquery-csv
                 records = csv.toArrays(data.toString());
-                console.log("CSV parsed");
+                //console.log("CSV parsed");
                 
                 // Now try to seperate it out into the seperate types of object
                 // Based on the parse code in the older TRNDiff                
@@ -55,7 +55,7 @@ router.post("/", (req, res) => {
                 var tableNames = [ "genomes", "regulogs", "regulons", "genes", "regulators", "sites" ];
                 var currentTable;
                 
-                console.log("Attempting to add records to object tables...")
+                //console.log("Attempting to add records to object tables...")
                 // Go through each line in the CSV array
                 for (var i = 0; i < records.length; i++) {
                     
@@ -67,7 +67,7 @@ router.post("/", (req, res) => {
                     // If the current line is a title of one of the objects,
                     // set the table index and make sure the table exists
                     if ( nameIndex >= 0 ) {
-                        console.log("Parsing " + tableNames[nameIndex] + " table");
+                        //console.log("Parsing " + tableNames[nameIndex] + " table");
                         currentTable = tables[nameIndex];
                     }
                         
@@ -77,63 +77,63 @@ router.post("/", (req, res) => {
                     }
                 }
                 
-                console.log("Completed adding records");
-                console.log("Attempting to create genomes table");
+                //console.log("Completed adding records");
+                //console.log("Attempting to create genomes table");
                 var genomes = parseGenomes(genomeRecords);
-                console.log("Attempting to create regulogs table");
+                //console.log("Attempting to create regulogs table");
                 var regulogs = parseRegulogs(regulogRecords);
-                console.log("Attempting to create regulons table");
+                //console.log("Attempting to create regulons table");
                 var regulons = parseRegulons(regulonRecords);
-                console.log("Attempting to create genes table");
+                //console.log("Attempting to create genes table");
                 var genes = parseGenes(geneRecords);
-                console.log("Attempting to create regulators table");
+                //console.log("Attempting to create regulators table");
                 var regulators = parseRegulators(regulatorRecords);
-                console.log("Attempting to create sites table");
+                //console.log("Attempting to create sites table");
                 var sites = parseSites(siteRecords);
                 
-                console.log("Successfully parsed CSV records")
+                //console.log("Successfully parsed CSV records")
                 
                 //res.writeHead(200, {'Content-Type': 'text/html'});
                 //res.write("Successfully loaded: ");
-                console.log(genomes.length + " genome(s)");
+                //console.log(genomes.length + " genome(s)");
                 //res.write(genomes.length + " genome(s), ");
                 /*for (var i = 0; i < genomes.length; i++) {
-                    console.log(genomes[i]);
+                    //console.log(genomes[i]);
                 }*/
-                //console.log(genomes[0]);
-                console.log(regulogs.length + " regulog(s)");
+                ////console.log(genomes[0]);
+                //console.log(regulogs.length + " regulog(s)");
                 //res.write(regulogs.length + " regulog(s), ");
                 /*for (var i = 0; i < regulogs.length; i++) {
-                    console.log(regulogs[i]);
+                    //console.log(regulogs[i]);
                 }*/
-                //console.log(regulogs[0]);
-                console.log(regulons.length + " regulon(s)");
+                ////console.log(regulogs[0]);
+                //console.log(regulons.length + " regulon(s)");
                 //res.write(regulons.length + " regulon(s), ");
                 /*for (var i = 0; i < regulons.length; i++) {
-                    console.log(regulons[i]);
+                    //console.log(regulons[i]);
                 }*/
-                //console.log(regulons[0]);
-                console.log(genes.length + " gene(s)");
+                ////console.log(regulons[0]);
+                //console.log(genes.length + " gene(s)");
                 //res.write(genes.length + " gene(s), ");
                 /*for (var i = 0; i < genes.length; i++) {
-                    console.log(genes[i]);
+                    //console.log(genes[i]);
                 }*/
-                //console.log(genes[0]);
-                console.log(regulators.length + " regulator(s)");
+                ////console.log(genes[0]);
+                //console.log(regulators.length + " regulator(s)");
                 //res.write(regulators.length + " regulator(s), and ");
                 /*for (var i = 0; i < regulators.length; i++) {
-                    console.log(regulators[i]);
+                    //console.log(regulators[i]);
                 }*/
-                //console.log(regulators[0]);
-                console.log(sites.length + " site(s)");
+                ////console.log(regulators[0]);
+                //console.log(sites.length + " site(s)");
                 //res.write(sites.length + " site(s)");
                 /*for (var i = 0; i < sites.length; i++) {
-                    console.log(sites[i]);
+                    //console.log(sites[i]);
                 }*/
-                //console.log(sites[0]);
+                ////console.log(sites[0]);
                 //res.end();
                 
-                console.log("Preparing CSV records to draw wagon wheels...");
+                //console.log("Preparing CSV records to draw wagon wheels...");
                 
                 // This is based on "getRegulogNetwork" from regprecise-local.js
                 let goTerms = JSON.parse(fs.readFileSync("./db/go/rp-gene-terms.json"));
@@ -183,7 +183,17 @@ router.post("/", (req, res) => {
 
                 network.binaryGeneMatrix = binaryGeneMatrix;
 
-                network.regulons = network.regulons.sort((a, b) => a.hammingDist - b.hammingDist);
+                //network.regulons = network.regulons.sort((a, b) => a.hammingDist - b.hammingDist);
+                
+                // If some regulons had a saved order, use that to determine
+                // the initial order, otherwise fall back to hamming distance
+                network.regulons = network.regulons.sort((a, b) => {
+                    if (a.order != null && b.order != null && a.order != b.order) {
+                        return a.order - b.order;
+                    } else {
+                        return a.hammingDist - b.hammingDist;
+                    }
+                });
     
                 // Adding these for access purposes
                 network["regulog"] = regulogs.find(r => r.regulogId == regulons[0].regulogId);
@@ -198,13 +208,56 @@ router.post("/", (req, res) => {
                     }
                 }
                 
-                console.log("Attempting to render CSV records as wagon wheels...");
-                res.render("wagon-wheels.pug", { network: network });
+                // If there were saved groups, set up clusters for these groups
+                // Regulons that do not have an assigned group will be placed
+                // in cluster 1 as a fall back
+                if (network.regulog.numGroups != null && network.regulog.numGroups > 1) {
+                    
+                    // Set up a temporary cluster list in the same format as
+                    // generated by the cluster functions. This will be cleared
+                    // after the initial display
+                    network["clusters"] = [];
+                    network.clusters[0] = [];
+                    
+                    // Go through each regulon and put their regulonId in the
+                    // correct group
+                    for (let regulon of network.regulons) {
+                        
+                        // 0 is the fall back group (group 1 in practice)
+                        let group = 0;
+
+                        // If the CSV set this regulon to be in a group that
+                        // doesn't fall in the number of groups in the regulog,
+                        // dump it into the first group
+                        if (regulon.groupNumber != null && regulon.groupNumber > 0 && regulon.groupNumber <= network.regulog.numGroups) {
+                            
+                            group = regulon.groupNumber - 1;
+                            
+                            // Initialise the cluster table if it is not already
+                            if (network.clusters[group] == null) {
+                                network.clusters[group] = [];
+                            }
+                            
+                            network.clusters[group].push(regulon.regulonId);
+                        }
+                    }
+                }
+                
+                // Remove the extra attributes about ordering and groups since
+                // we do not need them any more
+                delete network.regulog.numGroups;
+                for (let regulon of network.regulons) {
+                    delete regulon.groupNumber;
+                    delete regulon.order;
+                }
+                
+                //console.log("Attempting to render CSV records as wagon wheels...");
+                res.render("wagon-wheels_local.pug", { network: network });
                 return;
             
             // Catch an error and display it
             } catch (err) {
-                console.log("Failed to parse CSV")
+                //console.log("Failed to parse CSV")
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 res.write("An error occured while attempting to parse the CSV file: ");
                 res.write(err.message)
@@ -217,18 +270,18 @@ router.post("/", (req, res) => {
         rl = readline.createInterface(instream, outstream);
         
         rl.on('line', function (line) {
-            console.log(line);
+            //console.log(line);
         });
         
         rl.on('close', function (line) {
-            console.log(line);
-            console.log('done reading file.');
+            //console.log(line);
+            //console.log('done reading file.');
         });*/
       
-        /*console.log('Deleting uploaded file...');
+        /*//console.log('Deleting uploaded file...');
         fs.unlink(file.path, function (err) {
             if (err) throw err;
-            console.log('File deleted!');
+            //console.log('File deleted!');
         });*/
     });
 });
@@ -251,7 +304,7 @@ function parseGenomes(table) {
     
     // Return immediately if an empty table was passed
     if (table.length < 1) {
-        console.log("parseGenomes: Was given an empty table");
+        //console.log("parseGenomes: Was given an empty table");
         return genomes;
     }
     
@@ -260,11 +313,11 @@ function parseGenomes(table) {
     var columnIndexes = [];
     
     // Determine the index of each field from the first row of the parameter
-    // table. If the header does not contain one of the field names, throw an
-    // error
+    // table. If the header does not contain one of the field names, return an
+    // empty table
     for (var i = 0; i < requiredFields.length; i++) {
         if (table[0].indexOf(requiredFields[i]) == -1) {
-            console.log("parseGenomes: The header of this table does not contain " + requiredFields[i]);
+            //console.log("parseGenomes: The header of this table does not contain " + requiredFields[i]);
             return genomes;
         } else {
             columnIndexes[requiredFields[i]] = table[0].indexOf(requiredFields[i]);
@@ -299,7 +352,7 @@ function parseRegulogs(table) {
     
     // Return immediately if an empty table was passed
     if (table.length < 1) {
-        console.log("parseRegulogs: Was given an empty table");
+        //console.log("parseRegulogs: Was given an empty table");
         return regulogs;
     }
     
@@ -308,16 +361,20 @@ function parseRegulogs(table) {
     var columnIndexes = [];
     
     // Determine the index of each field from the first row of the parameter
-    // table. If the header does not contain one of the field names, throw an
-    // error
+    // table. If the header does not contain one of the field names, return an
+    // empty table
     for (var i = 0; i < requiredFields.length; i++) {
         if (table[0].indexOf(requiredFields[i]) == -1) {
-            console.log("parseRegulogs: The header of this table does not contain " + requiredFields[i]);
+            //console.log("parseRegulogs: The header of this table does not contain " + requiredFields[i]);
             return regulogs;
         } else {
             columnIndexes[requiredFields[i]] = table[0].indexOf(requiredFields[i]);
         }
     }
+    
+    // Check if there's a "numGroups" or "groupNumber"; This will be used to set
+    // the initial number of groups if present
+    var numGroupsIndex = table[0].indexOf("numGroups");
     
     // Go through the rest of the rows in the parameter table and create an
     // object for each of them, adding them to the new table
@@ -330,11 +387,16 @@ function parseRegulogs(table) {
             currentRegulog[requiredFields[j]] = table[i][columnIndexes[requiredFields[j]]];
         }
         
+        // Add optional values if present
+        if (numGroupsIndex != -1 && table[i][numGroupsIndex] != "") {
+            currentRegulog.numGroups = table[i][numGroupsIndex];
+        }
+        
         regulogs.push(currentRegulog);
     }
     
     // Return the new completed table
-    console.log("parseRegulogs: Finished");
+    //console.log("parseRegulogs: Finished");
     return regulogs;
 }
 
@@ -348,7 +410,7 @@ function parseRegulons(table) {
     
     // Return immediately if an empty table was passed
     if (table.length < 1) {
-        console.log("parseRegulons: Was given an empty table");
+        //console.log("parseRegulons: Was given an empty table");
         return regulons;
     }
     
@@ -357,16 +419,21 @@ function parseRegulons(table) {
     var columnIndexes = [];
     
     // Determine the index of each field from the first row of the parameter
-    // table. If the header does not contain one of the field names, throw an
-    // error
+    // table. If the header does not contain one of the field names, return an
+    // empty table
     for (var i = 0; i < requiredFields.length; i++) {
         if (table[0].indexOf(requiredFields[i]) == -1) {
-            console.log("parseRegulons: The header of this table does not contain " + requiredFields[i]);
+            //console.log("parseRegulons: The header of this table does not contain " + requiredFields[i]);
             return regulons;
         } else {
             columnIndexes[requiredFields[i]] = table[0].indexOf(requiredFields[i]);
         }
     }
+    
+    // Check if there's an "order" or "groupNumber"; These will be used to
+    // assign the initial order or group number if present
+    var orderIndex = table[0].indexOf("order");
+    var groupNumberIndex = table[0].indexOf("groupNumber");
     
     // Go through the rest of the rows in the parameter table and create an
     // object for each of them, adding them to the new table
@@ -379,11 +446,19 @@ function parseRegulons(table) {
             currentRegulon[requiredFields[j]] = table[i][columnIndexes[requiredFields[j]]];
         }
         
+        // Add optional values if present
+        if (orderIndex != -1 && table[i][orderIndex] != "") {
+            currentRegulon.order = table[i][orderIndex];
+        }
+        if (groupNumberIndex != -1 && table[i][groupNumberIndex] != "") {
+            currentRegulon.groupNumber = table[i][groupNumberIndex];
+        }
+        
         regulons.push(currentRegulon);
     }
     
     // Return the new completed table
-    console.log("parseRegulons: Finished");    
+    //console.log("parseRegulons: Finished");    
     return regulons;
 }
 
@@ -397,7 +472,7 @@ function parseGenes(table) {
     
     // Return immediately if an empty table was passed
     if (table.length < 1) {
-        console.log("parseGenes: Was given an empty table");
+        //console.log("parseGenes: Was given an empty table");
         return genes;
     }
     
@@ -406,11 +481,11 @@ function parseGenes(table) {
     var columnIndexes = [];
     
     // Determine the index of each field from the first row of the parameter
-    // table. If the header does not contain one of the field names, throw an
-    // error
+    // table. If the header does not contain one of the field names, return an
+    // empty table
     for (var i = 0; i < requiredFields.length; i++) {
         if (table[0].indexOf(requiredFields[i]) == -1) {
-            console.log("parseGenes: The header of this table does not contain " + requiredFields[i]);
+            //console.log("parseGenes: The header of this table does not contain " + requiredFields[i]);
             return genes;
         } else {
             columnIndexes[requiredFields[i]] = table[0].indexOf(requiredFields[i]);
@@ -451,7 +526,7 @@ function parseGenes(table) {
     }
     
     // Return the new completed table
-    console.log("parseGenes: Finished");    
+    //console.log("parseGenes: Finished");    
     return genes;
 }
 
@@ -465,7 +540,7 @@ function parseRegulators(table) {
     
     // Return immediately if an empty table was passed
     if (table.length < 1) {
-        console.log("parseRegulators: Was given an empty table");
+        //console.log("parseRegulators: Was given an empty table");
         return regulators;
     }
     
@@ -474,11 +549,11 @@ function parseRegulators(table) {
     var columnIndexes = [];
     
     // Determine the index of each field from the first row of the parameter
-    // table. If the header does not contain one of the field names, throw an
-    // error
+    // table. If the header does not contain one of the field names, return an
+    // empty table
     for (var i = 0; i < requiredFields.length; i++) {
         if (table[0].indexOf(requiredFields[i]) == -1) {
-            console.log("parseRegulators: The header of this table does not contain " + requiredFields[i]);
+            //console.log("parseRegulators: The header of this table does not contain " + requiredFields[i]);
             return regulators;
         } else {
             columnIndexes[requiredFields[i]] = table[0].indexOf(requiredFields[i]);
@@ -500,7 +575,7 @@ function parseRegulators(table) {
     }
     
     // Return the new completed table
-    console.log("parseRegulators: Finished");    
+    //console.log("parseRegulators: Finished");    
     return regulators;
 }
 
@@ -514,7 +589,7 @@ function parseSites(table) {
     
     // Return immediately if an empty table was passed
     if (table.length < 1) {
-        console.log("parseSites: Was given an empty table");
+        //console.log("parseSites: Was given an empty table");
         return sites;
     }
     
@@ -523,11 +598,11 @@ function parseSites(table) {
     var columnIndexes = {};
     
     // Determine the index of each field from the first row of the parameter
-    // table. If the header does not contain one of the field names, throw an
-    // error
+    // table. If the header does not contain one of the field names, return an
+    // empty table
     for (var i = 0; i < requiredFields.length; i++) {
         if (table[0].indexOf(requiredFields[i]) == -1) {
-            console.log("parseSites: The header of this table does not contain " + requiredFields[i]);
+            //console.log("parseSites: The header of this table does not contain " + requiredFields[i]);
             return sites;
         } else {
             columnIndexes[requiredFields[i]] = table[0].indexOf(requiredFields[i]);
@@ -549,7 +624,7 @@ function parseSites(table) {
     }
     
     // Return the new completed table
-    console.log("parseSites: Finished");
+    //console.log("parseSites: Finished");
     return sites;
 }
 

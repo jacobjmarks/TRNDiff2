@@ -1,0 +1,87 @@
+extends layout
+
+block scripts
+    script.
+        regulogNetwork = !{JSON.stringify(network)};
+    script(src="/js/wagon-wheels.js")
+    script(src="/js/graph-header.js")
+    link(rel="stylesheet" href="/css/wagon-wheels.css")
+
+block content
+    .ui.three.steps
+        //-a.step.completed(href="/regprecise/genomes")
+        //-    .content
+        //-        .title= network["selected-genome"].name
+        //-        .description Selected Genome
+        //-a.step.completed(href=`/regprecise/regulons?genomeId=${network.regulons.find(r => r.regulonId == network["selected-regulon"]).genomeId}`)
+        //-    .content
+        //-        - var selectedRegulon = network.regulons.find(r => r.regulonId == network["selected-regulon"])
+        //-        .title= selectedRegulon.regulatorFamily + ' / ' + selectedRegulon.regulatorName
+        //-        .description Selected Regulon
+        //-a.step.active
+        //-    .content
+        //-        .title Regulog Graph
+        //-        .description Network of selected Regulon
+        .step
+            .content
+            - var selectedRegulon = network.regulons.find(r => r.regulonId == network["selected-regulon"])
+            .title= 'Regulog: ' + selectedRegulon.regulatorFamily + ' / ' + selectedRegulon.regulatorName
+
+    #graph
+        #header
+            .ui.stackable.secondary.menu
+                .ui.item Sort Regulons By:
+                .ui.item.dropdown#sort-regulons-by
+                    .text Hamming Distance
+                    i.dropdown.icon
+                    .menu
+                        .item(data-value="hamming-distance").active.selected Hamming Distance
+                        .item(data-value="levenstein-distance") Levenstein Distance
+                        //-.item(data-value="kmeans-1") KMeans Cluster (K1)
+                        //-.item(data-value="kmeans-2") KMeans Cluster (K2)
+                        //-.item(data-value="kmeans-3") KMeans Cluster (K3)
+                        //-.item(data-value="kmeans-4") KMeans Cluster (K4)
+                        .item(data-value="gene-count") Gene Count
+                        .item(data-value="genome-name") Genome Name
+                .ui.item Sort Genes By:
+                .ui.item.dropdown#sort-genes-by
+                    .text Name
+                    i.dropdown.icon
+                    .menu
+                        .item(data-value="name").active.selected Name
+                        .item(data-value="function") Function
+                        .item(data-value="go-term") GO Term
+                        
+                .ui.item Cluster Regulons By:
+                .ui.item.dropdown#cluster-regulons-by
+                    .text No Clustering
+                    i.dropdown.icon
+                    .menu
+                        .item(data-value="name").active.selected No Clustering
+                        .item(data-value="kmeans-1") KMeans Cluster (K1)
+                        .item(data-value="kmeans-2") KMeans Cluster (K2)
+                        .item(data-value="kmeans-3") KMeans Cluster (K3)
+                        .item(data-value="kmeans-4") KMeans Cluster (K4)
+                        
+                a.right.item(onclick="generateCSV()") Save To CSV
+
+                .right.menu
+                    .ui.dropdown.item Compare
+                        i.dropdown.icon
+                        .menu
+                            .item#btn-compare-and AND
+                            .item#btn-compare-or OR
+                            .item#btn-compare-xor XOR
+                    .item
+                        .ui.large.basic.icon.buttons
+                            button.ui.button#btn-zoom-out
+                                i.zoom-out.icon
+                            button.ui.button#btn-zoom-in
+                                i.zoom-in.icon
+        #goterm-legend
+        #body.ui.cards(style="clear:both")
+        #graph-dimmer.ui.inverted.page.dimmer
+            .content
+
+    script.
+        $("#graph #header .right.menu .dropdown.item").dropdown();

@@ -141,7 +141,7 @@ function generateCSV() {
     
     // Regulogs
     console.log('Adding regulog data...');
-    CSV += '\n\nRegulogs\n\neffector,pathway,regulationType,regulatorFamily,regulatorName,regulogId,taxonName\n';
+    CSV += '\n\nRegulogs\n\neffector,pathway,regulationType,regulatorFamily,regulatorName,regulogId,taxonName,numGroups\n';
     
     let regulog = regulogNetwork.regulog;
         
@@ -155,16 +155,26 @@ function generateCSV() {
     let taxonName = regulog.taxonName != null ? regulog.taxonName : '';
     
     // Add them to the string
-    CSV += '"' + effector + '","' + pathway + '","' + regulationType + '","' + regulatorFamily + '","' + regulatorName + '",' + regulogId + ',"' + taxonName + '"\n';
+    CSV += '"' + effector + '","' + pathway + '","' + regulationType + '","' + regulatorFamily + '","' + regulatorName + '",' + regulogId + ',"' + taxonName + '"';
+    
+    // If there is more than one group, add the number of groups
+    if (currentClusters != -1 && currentClusters.length > 1) {
+        CSV += ',' + currentClusters.length + '\n';
+    // Otherwise set the number of groups to one
+    } else {
+        CSV += ',1\n';
+    }
     
     // Regulons
     console.log('Adding regulon data...');
-    CSV += '\n\nRegulons\n\neffector,genomeId,genomeName,pathway,regulationType,regulatorFamily,regulatorName,regulogId,regulonId\n';
+    CSV += '\n\nRegulons\n\neffector,genomeId,genomeName,pathway,regulationType,regulatorFamily,regulatorName,regulogId,regulonId,order,groupNumber\n';
     
     // Since genes are added to the regulon objects, make a list of them here
     let genes = [];
     
-    for (let regulon of regulogNetwork.regulons) {
+    //for (let regulon of regulogNetwork.regulons) {
+    for (var i = 0; i < regulogNetwork.regulons.length; i++) {
+        regulon = regulogNetwork.regulons[i];
         
         // Get all the attributes, or an empty string if they are not present
         let effector = regulon.effector != null ? regulon.effector : '';
@@ -178,7 +188,21 @@ function generateCSV() {
         let regulonId = regulon.regulonId != null ? regulon.regulonId : '';
         
         // Add them to the string
-        CSV += '"' + effector + '",' + genomeId + ',"' + genomeName + '","' + pathway + '","' + regulationType + '","' + regulatorFamily + '","' + regulatorName + '",' + regulogId + ',' + regulonId + '\n';
+        CSV += '"' + effector + '",' + genomeId + ',"' + genomeName + '","' + pathway + '","' + regulationType + '","' + regulatorFamily + '","' + regulatorName + '",' + regulogId + ',' + regulonId + '';
+    
+        // If there is more than one group, add the group they are in as well
+        // as the correct ordering for that group
+        if (currentClusters != -1 && currentClusters.length > 1) {
+            for (var j = 0; j < currentClusters.length; j++) {
+                if (currentClusters[j].indexOf(regulon.regulonId) != -1) {
+                    CSV += ',' + currentClusters[j].indexOf(regulonId) + ',' + (j+1) + '\n';
+                    break;
+                }
+            }
+        // Otherwise just get the order and set the groupNumber as '1'
+        } else {
+            CSV += ',' + i + ',1\n';
+        }
         
         // Store all the target genes for this regulon
         for (let gene of regulon.targetGenes) {
