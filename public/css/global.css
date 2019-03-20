@@ -9,3 +9,19 @@ body {
 .ui.steps .step {
     padding: 10px !important;
 }
+
+/* Class for popups that I took from the older TRNDiff */
+.ChooserPopup {
+    position: absolute;
+    /*min-width: 200px;*/
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    display:block;
+    z-index:15;
+	background: rgb(230,230,230);
+	color: rgb(64,64,64);
+	margin: 0px 2pt 0px 20px;
+	padding: 4px 10px 4px 10px;
+	border-radius: 4px;
+}

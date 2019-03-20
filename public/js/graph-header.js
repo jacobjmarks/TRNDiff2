@@ -39,7 +39,7 @@ $(document).ready(() => {
             if (currentClusters != - 1) {
                 sortClusteredRegulons(currentClusters);
                 drawClusteredWagonWheels(currentClusters);
-            } else {                
+            } else {
                 drawWagonWheels();
             }
         }
@@ -67,7 +67,7 @@ $(document).ready(() => {
             }
         }
     });
-    
+
     $("#cluster-regulons-by.dropdown").dropdown({
         onChange: (value) => {
             if (value.includes("kmeans")) {
@@ -91,10 +91,29 @@ $(document).ready(() => {
                 })
                 return;
             }
-            
+
             drawWagonWheels()
         }
     });
+
+    // Show the popup for the query highlight button when it's clicked
+    $("#search-query_item").click((event) => {
+        event.stopPropagation();
+        document.getElementById('search-query_popup').style.display = '';
+    });
+    
+    // Don't propogate events when clicking in a popup
+    $.each($(".ChooserPopup"), (i, popup) => {
+        $(popup).click((event) => { event.stopPropagation(); } );
+    });
+
+    // If the user clicks anywhere (except an element with stop propagation),
+    // clear any popups
+    document.onclick = function() {
+        $.each($(".ChooserPopup"), (i, popup) => {
+            $(popup).css('display', 'none');
+        });
+    }
 })
 
 /**
@@ -119,13 +138,13 @@ function sortClusteredRegulons(data) {
 function generateCSV() {
     console.log('Generating CSV...');
     let CSV = '';
-    
+
     // Genomes
     console.log('Adding genome data...');
     CSV += 'Genomes\n\ngenomeId,name,rnaRegulonCount,rnaSiteCount,taxonomyId,tfRegulonCount,tfSiteCount\n';
-    
+
     for (let genome of regulogNetwork.genomes) {
-        
+
         // Get all the attributes, or an empty string if they are not present
         let genomeId = genome.genomeId != null ? genome.genomeId : '';
         let name = genome.name != null ? genome.name : '';
@@ -134,17 +153,17 @@ function generateCSV() {
         let taxonomyId = genome.taxonomyId != null ? genome.taxonomyId : '';
         let tfRegulonCount = genome.tfRegulonCount != null ? genome.tfRegulonCount : '';
         let tfSiteCount = genome.tfSiteCount != null ? genome.tfSiteCount : '';
-        
+
         // Add them to the string
         CSV += genomeId + ',"' + name + '",' + rnaRegulonCount + ',' + rnaSiteCount + ',' + taxonomyId + ',' + tfRegulonCount + ',' + tfSiteCount + '\n';
     }
-    
+
     // Regulogs
     console.log('Adding regulog data...');
     CSV += '\n\nRegulogs\n\neffector,pathway,regulationType,regulatorFamily,regulatorName,regulogId,taxonName,numGroups\n';
-    
+
     let regulog = regulogNetwork.regulog;
-        
+
     // Get all the attributes, or an empty string if they are not present
     let effector = regulog.effector != null ? regulog.effector : '';
     let pathway = regulog.pathway != null ? regulog.pathway : '';
@@ -153,10 +172,10 @@ function generateCSV() {
     let regulatorName = regulog.regulatorName != null ? regulog.regulatorName : '';
     let regulogId = regulog.regulogId != null ? regulog.regulogId : '';
     let taxonName = regulog.taxonName != null ? regulog.taxonName : '';
-    
+
     // Add them to the string
     CSV += '"' + effector + '","' + pathway + '","' + regulationType + '","' + regulatorFamily + '","' + regulatorName + '",' + regulogId + ',"' + taxonName + '"';
-    
+
     // If there is more than one group, add the number of groups
     if (currentClusters != -1 && currentClusters.length > 1) {
         CSV += ',' + currentClusters.length + '\n';
@@ -164,18 +183,18 @@ function generateCSV() {
     } else {
         CSV += ',1\n';
     }
-    
+
     // Regulons
     console.log('Adding regulon data...');
     CSV += '\n\nRegulons\n\neffector,genomeId,genomeName,pathway,regulationType,regulatorFamily,regulatorName,regulogId,regulonId,order,groupNumber\n';
-    
+
     // Since genes are added to the regulon objects, make a list of them here
     let genes = [];
-    
+
     //for (let regulon of regulogNetwork.regulons) {
     for (var i = 0; i < regulogNetwork.regulons.length; i++) {
         regulon = regulogNetwork.regulons[i];
-        
+
         // Get all the attributes, or an empty string if they are not present
         let effector = regulon.effector != null ? regulon.effector : '';
         let genomeId = regulon.genomeId != null ? regulon.genomeId : '';
@@ -186,10 +205,10 @@ function generateCSV() {
         let regulatorName = regulon.regulatorName != null ? regulon.regulatorName : '';
         let regulogId = regulon.regulogId != null ? regulon.regulogId : '';
         let regulonId = regulon.regulonId != null ? regulon.regulonId : '';
-        
+
         // Add them to the string
         CSV += '"' + effector + '",' + genomeId + ',"' + genomeName + '","' + pathway + '","' + regulationType + '","' + regulatorFamily + '","' + regulatorName + '",' + regulogId + ',' + regulonId + '';
-    
+
         // If there is more than one group, add the group they are in as well
         // as the correct ordering for that group
         if (currentClusters != -1 && currentClusters.length > 1) {
@@ -203,22 +222,22 @@ function generateCSV() {
         } else {
             CSV += ',' + i + ',1\n';
         }
-        
+
         // Store all the target genes for this regulon
         for (let gene of regulon.targetGenes) {
             genes.push(gene);
         }
     }
-    
+
     // Genes
     console.log('Adding gene data...');
     CSV += '\n\nGenes\n\ngeneFunction,locusTag,name,regulonId,vimssId,goParentTerm\n'
-    
+
     // Since sites are added to the gene objects, make a list of them here
     let sites = [];
-    
+
     for (let gene of genes) {
-        
+
         // Get all the attributes, or an empty string if they are not present
         let geneFunction = gene.function != null ? gene.function : '';
         let locusTag = gene.locusTag != null ? gene.locusTag : '';
@@ -226,39 +245,39 @@ function generateCSV() {
         let regulonId = gene.regulonId != null ? gene.regulonId : '';
         let vimssId = gene.vimssId != null ? gene.vimssId : '';
         let goParentTerm = gene.term != null ? gene.term : '';
-        
+
         // Add them to the string
         CSV += '"' + geneFunction + '","' + locusTag + '","' + name + '",' + regulonId + ',' + vimssId + ',"' + goParentTerm + '"\n';
-        
+
         // Store all the sites for this gene
         for (let site of gene.sites) {
             sites.push(site);
         }
     }
-    
+
     // Regulators
     console.log('Adding regulator data...');
     CSV += '\n\nRegulators\n\nlocusTag,name,regulatorFamily,regulonId,vimssId\n'
-    
+
     for (let regulator of regulogNetwork.regulators) {
-        
+
         // Get all the attributes, or an empty string if they are not present
         let locusTag = regulator.locusTag != null ? regulator.locusTag : '';
         let name = regulator.name != null ? regulator.name : '';
         let regulatorFamily = regulator.regulatorFamily != null ? regulator.regulatorFamily : '';
         let regulonId = regulator.regulonId != null ? regulator.regulonId : '';
         let vimssId = regulator.vimssId != null ? regulator.vimssId : '';
-        
+
         // Add them to the string
         CSV += '"' + locusTag + '","' + name + '","' + regulatorFamily + '",' + regulonId + ',' + vimssId + '\n';
     }
-    
+
     // Sites
     console.log('Adding site data...');
     CSV += '\n\nSites\n\ngeneLocusTag,geneVIMSSId,position,regulonId,score,sequence\n'
-    
+
     for (let site of sites) {
-        
+
         // Get all the attributes, or an empty string if they are not present
         let geneLocusTag = site.geneLocusTag != null ? site.geneLocusTag : '';
         let geneVIMSSId = site.geneVIMSSId != null ? site.geneVIMSSId : '';
@@ -266,11 +285,11 @@ function generateCSV() {
         let regulonId = site.regulonId != null ? site.regulonId : '';
         let score = site.score != null ? site.score : '';
         let sequence = site.sequence != null ? site.sequence : '';
-        
+
         // Add them to the string
         CSV += '"' + geneLocusTag + '",' + geneVIMSSId + ',' + position + ',' + regulonId + ',' + score + ',"' + sequence + '"\n';
     }
-    
+
     console.log('Done');
     download(CSV, 'regulog' + regulogId + '.csv', 'text/csv');
 }
@@ -290,7 +309,7 @@ function download(data, filename, type) {
         a.click();
         setTimeout(function() {
             document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);  
-        }, 0); 
+            window.URL.revokeObjectURL(url);
+        }, 0);
     }
 }

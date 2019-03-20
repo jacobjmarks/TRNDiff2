@@ -60,6 +60,13 @@ block content
                         .item(data-value="kmeans-3") KMeans Cluster (K3)
                         .item(data-value="kmeans-4") KMeans Cluster (K4)
                         
+                a.right.item#search-query_item Query Highlight
+                    .ChooserPopup#search-query_popup(style="display: none;")
+                        .ui.item Highlight Genes With:
+                        input#search-query_text
+                        a.item#search-query_buttonSearch(onclick="document.getElementById('search-query_popup').style.display = 'none'") Search
+                        a.item#search-query_buttonClear(onclick="document.getElementById('search-query_popup').style.display = 'none'") Clear
+                        
                 a.right.item(onclick="generateCSV()") Save To CSV
 
                 .right.menu
