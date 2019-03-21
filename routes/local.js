@@ -60,7 +60,7 @@ router.post("/", (req, res) => {
                 for (var i = 0; i < records.length; i++) {
                     
                     // Skip the current line if it is empty
-                    if (records[i].length < 1 || records[i] == null || records[i][0].length == 0 || records[i][0] == "") continue;
+                    if (records[i].length < 1 || records[i] === undefined || records[i][0].length === 0 || records[i][0] === "") continue;
                     
                     var nameIndex = tableNames.indexOf(records[i][0].toLowerCase());
                     
@@ -133,6 +133,20 @@ router.post("/", (req, res) => {
                 ////console.log(sites[0]);
                 //res.end();
                 
+                // If there are duplicate regulon IDs, throw an error since an
+                // important assumption in the visualisation is that each
+                // regulon has a unique ID
+                for (let i = 0; i < regulons.length; i++) {
+                    for (let j = 0; j < regulons.length; j++) {
+                        if (i !== j && regulons[i].regulonId === regulons[j].regulonId) {
+                            console.log("There are duplicate regulon IDs! Throwing an error...");
+                            let err = {};
+                            err.message = 'This CSV file has duplicate regulon IDs.';
+                            throw err;
+                        }
+                    }
+                }
+                
                 //console.log("Preparing CSV records to draw wagon wheels...");
                 
                 // This is based on "getRegulogNetwork" from regprecise-local.js
@@ -140,23 +154,23 @@ router.post("/", (req, res) => {
                 let network = {};
                 network["selected-regulon"] = regulons[0].regulonId;
                 network["regulons"] = regulons;
-                network["selected-genome"] = genomes.find(g => g.genomeId == regulons[0].genomeId);
+                network["selected-genome"] = genomes.find(g => g.genomeId === regulons[0].genomeId);
 
                 for (let regulon of network["regulons"]) {
-                    let newGenes = genes.filter(g => g.regulonId == regulon.regulonId);
-                    newGenes = newGenes.filter(g => g.name != undefined);
+                    let newGenes = genes.filter(g => g.regulonId === regulon.regulonId);
+                    newGenes = newGenes.filter(g => g.name !== undefined);
 
-                    regulon.regulator = regulators.find(g => g.name && g.name.toLowerCase() == regulon.regulatorName.toLowerCase())
-                    regulon.targetGenes = newGenes.filter(g => g.name && g != regulon.regulator);
+                    regulon.regulator = regulators.find(g => g.name && g.name.toLowerCase() === regulon.regulatorName.toLowerCase())
+                    regulon.targetGenes = newGenes.filter(g => g.name && g !== regulon.regulator);
 
                     for (let gene of regulon.targetGenes) {
-                        gene.sites = sites.filter(s => s.geneVIMSSId == gene.vimssId);
+                        gene.sites = sites.filter(s => s.geneVIMSSId === gene.vimssId);
                         
                         // Only try to get a GO term if one wasn't already
                         // loaded from the CSV
-                        if (gene.term == null) {
-                            let goTerm = goTerms.find(t => t.geneName == gene.name)
-                            if (goTerm != null) {
+                        if (gene.term === undefined) {
+                            let goTerm = goTerms.find(t => t.geneName === gene.name)
+                            if (goTerm !== undefined) {
                                 gene.term = goTerm.term;
                             } else {
                                 gene.term = "unknown";
@@ -176,7 +190,7 @@ router.post("/", (req, res) => {
                 let target = binaryGeneMatrix[regulons[0].regulonId];
 
                 for (let key of Object.keys(binaryGeneMatrix)) {
-                    let regulon = network["regulons"].find(r => r.regulonId == key);
+                    let regulon = network["regulons"].find(r => r.regulonId === key);
                     regulon.hammingDist = hammingDist(target, binaryGeneMatrix[key]);
                     regulon.levensteinDist = levensteinDist(target, binaryGeneMatrix[key]);
                 }
@@ -188,7 +202,7 @@ router.post("/", (req, res) => {
                 // If some regulons had a saved order, use that to determine
                 // the initial order, otherwise fall back to hamming distance
                 network.regulons = network.regulons.sort((a, b) => {
-                    if (a.order != null && b.order != null && a.order != b.order) {
+                    if (a.order !== undefined && b.order !== undefined && a.order !== b.order) {
                         return a.order - b.order;
                     } else {
                         return a.hammingDist - b.hammingDist;
@@ -196,14 +210,14 @@ router.post("/", (req, res) => {
                 });
     
                 // Adding these for access purposes
-                network["regulog"] = regulogs.find(r => r.regulogId == regulons[0].regulogId);
+                network["regulog"] = regulogs.find(r => r.regulogId === regulons[0].regulogId);
                 network["regulators"] = [];
                 network["genomes"] = [];
                 for (let regulon of network["regulons"]) {
-                    for (let regulator of regulators.filter(r => r.regulonId == regulon.regulonId)) {
+                    for (let regulator of regulators.filter(r => r.regulonId === regulon.regulonId)) {
                         network.regulators.push(regulator);
                     }
-                    for (let genome of genomes.filter(g => g.genomeId == regulon.genomeId)) {
+                    for (let genome of genomes.filter(g => g.genomeId === regulon.genomeId)) {
                         network.genomes.push(genome);
                     }
                 }
@@ -211,7 +225,7 @@ router.post("/", (req, res) => {
                 // If there were saved groups, set up clusters for these groups
                 // Regulons that do not have an assigned group will be placed
                 // in cluster 1 as a fall back
-                if (network.regulog.numGroups != null && network.regulog.numGroups > 1) {
+                if (network.regulog.numGroups !== undefined && network.regulog.numGroups > 1) {
                     
                     // Set up a temporary cluster list in the same format as
                     // generated by the cluster functions. This will be cleared
@@ -229,17 +243,39 @@ router.post("/", (req, res) => {
                         // If the CSV set this regulon to be in a group that
                         // doesn't fall in the number of groups in the regulog,
                         // dump it into the first group
-                        if (regulon.groupNumber != null && regulon.groupNumber > 0 && regulon.groupNumber <= network.regulog.numGroups) {
+                        if (regulon.groupNumber !== undefined && regulon.groupNumber > 0 && regulon.groupNumber <= network.regulog.numGroups) {
                             
                             group = regulon.groupNumber - 1;
                             
                             // Initialise the cluster table if it is not already
-                            if (network.clusters[group] == null) {
+                            if (network.clusters[group] === undefined) {
                                 network.clusters[group] = [];
                             }
                             
                             network.clusters[group].push(regulon.regulonId);
                         }
+                    }
+                }
+                
+                // Add a list for selected regulons and genes - this will be
+                // removed once it is copied in the wagon wheel view
+                // This also deletes the "selected" attribute as it progresses
+                // since it is no longer required after this
+                // Note: If at least one gene of a certain name is selected,
+                // the visualisation will treat *all* genes of that name as
+                // selected
+                network["selectedRegulons"] = [];
+                network["selectedGenes"] = [];
+                for (let regulon of network.regulons) {                    
+                    if (regulon.selected) {
+                        network.selectedRegulons.push(regulon.regulonId);
+                    }                    
+                    delete regulon.selected;                    
+                    for (let gene of regulon.targetGenes) {                        
+                        if (gene.selected && network.selectedGenes.indexOf(gene.name) === -1) {
+                            network.selectedGenes.push(gene.name);                            
+                        }                        
+                        delete gene.selected;
                     }
                 }
                 
@@ -316,7 +352,7 @@ function parseGenomes(table) {
     // table. If the header does not contain one of the field names, return an
     // empty table
     for (var i = 0; i < requiredFields.length; i++) {
-        if (table[0].indexOf(requiredFields[i]) == -1) {
+        if (table[0].indexOf(requiredFields[i]) === -1) {
             //console.log("parseGenomes: The header of this table does not contain " + requiredFields[i]);
             return genomes;
         } else {
@@ -364,7 +400,7 @@ function parseRegulogs(table) {
     // table. If the header does not contain one of the field names, return an
     // empty table
     for (var i = 0; i < requiredFields.length; i++) {
-        if (table[0].indexOf(requiredFields[i]) == -1) {
+        if (table[0].indexOf(requiredFields[i]) === -1) {
             //console.log("parseRegulogs: The header of this table does not contain " + requiredFields[i]);
             return regulogs;
         } else {
@@ -388,7 +424,7 @@ function parseRegulogs(table) {
         }
         
         // Add optional values if present
-        if (numGroupsIndex != -1 && table[i][numGroupsIndex] != "") {
+        if (numGroupsIndex !== -1 && table[i][numGroupsIndex] !== "") {
             currentRegulog.numGroups = table[i][numGroupsIndex];
         }
         
@@ -422,7 +458,7 @@ function parseRegulons(table) {
     // table. If the header does not contain one of the field names, return an
     // empty table
     for (var i = 0; i < requiredFields.length; i++) {
-        if (table[0].indexOf(requiredFields[i]) == -1) {
+        if (table[0].indexOf(requiredFields[i]) === -1) {
             //console.log("parseRegulons: The header of this table does not contain " + requiredFields[i]);
             return regulons;
         } else {
@@ -434,6 +470,9 @@ function parseRegulons(table) {
     // assign the initial order or group number if present
     var orderIndex = table[0].indexOf("order");
     var groupNumberIndex = table[0].indexOf("groupNumber");
+    
+    // Also check if there is a "selected" column
+    var selectedIndex = table[0].indexOf("selected");
     
     // Go through the rest of the rows in the parameter table and create an
     // object for each of them, adding them to the new table
@@ -447,11 +486,14 @@ function parseRegulons(table) {
         }
         
         // Add optional values if present
-        if (orderIndex != -1 && table[i][orderIndex] != "") {
+        if (orderIndex !== -1 && table[i][orderIndex] !== "") {
             currentRegulon.order = table[i][orderIndex];
         }
-        if (groupNumberIndex != -1 && table[i][groupNumberIndex] != "") {
+        if (groupNumberIndex !== -1 && table[i][groupNumberIndex] !== "") {
             currentRegulon.groupNumber = table[i][groupNumberIndex];
+        }
+        if (selectedIndex !== -1 && table[i][selectedIndex] !== "") {
+            currentRegulon.selected = (table[i][selectedIndex] === 'true');            
         }
         
         regulons.push(currentRegulon);
@@ -484,7 +526,7 @@ function parseGenes(table) {
     // table. If the header does not contain one of the field names, return an
     // empty table
     for (var i = 0; i < requiredFields.length; i++) {
-        if (table[0].indexOf(requiredFields[i]) == -1) {
+        if (table[0].indexOf(requiredFields[i]) === -1) {
             //console.log("parseGenes: The header of this table does not contain " + requiredFields[i]);
             return genes;
         } else {
@@ -497,6 +539,9 @@ function parseGenes(table) {
     var goParentTermIndex = table[0].indexOf("goParentTerm");
     var goTermIndex = table[0].indexOf("goTerm");
     
+    // Also check if there is a "selected" column
+    var selectedIndex = table[0].indexOf("selected");
+    
     // Go through the rest of the rows in the parameter table and create an
     // object for each of them, adding them to the new table
     for (var i = 1; i < table.length; i++) {
@@ -508,7 +553,7 @@ function parseGenes(table) {
             
             // "geneFunction" is a special case - this TRNDiff expects "function"
             // hence we have to make sure the field name is the latter
-            if (requiredFields[j] == "geneFunction") {
+            if (requiredFields[j] === "geneFunction") {
                 currentGene["function"] = table[i][columnIndexes[requiredFields[j]]];
             } else {
                 currentGene[requiredFields[j]] = table[i][columnIndexes[requiredFields[j]]];
@@ -516,10 +561,15 @@ function parseGenes(table) {
         }
         
         // Add existing GO terms if present
-        if (goParentTermIndex != -1 && table[i][goParentTermIndex] != "") {
+        if (goParentTermIndex !== -1 && table[i][goParentTermIndex] !== "") {
             currentGene.term = table[i][goParentTermIndex];
-        } else if (goTermIndex != -1 && table[i][goTermIndex] != "") {
+        } else if (goTermIndex !== -1 && table[i][goTermIndex] !== "") {
             currentGene.term = table[i][goTermIndex];            
+        }
+        
+        // Add optional values if present
+        if (selectedIndex !== -1 && table[i][selectedIndex] !== "") {
+            currentGene.selected = (table[i][selectedIndex] === 'true');            
         }
                 
         genes.push(currentGene);
@@ -552,7 +602,7 @@ function parseRegulators(table) {
     // table. If the header does not contain one of the field names, return an
     // empty table
     for (var i = 0; i < requiredFields.length; i++) {
-        if (table[0].indexOf(requiredFields[i]) == -1) {
+        if (table[0].indexOf(requiredFields[i]) === -1) {
             //console.log("parseRegulators: The header of this table does not contain " + requiredFields[i]);
             return regulators;
         } else {
@@ -601,7 +651,7 @@ function parseSites(table) {
     // table. If the header does not contain one of the field names, return an
     // empty table
     for (var i = 0; i < requiredFields.length; i++) {
-        if (table[0].indexOf(requiredFields[i]) == -1) {
+        if (table[0].indexOf(requiredFields[i]) === -1) {
             //console.log("parseSites: The header of this table does not contain " + requiredFields[i]);
             return sites;
         } else {
@@ -635,7 +685,7 @@ function generateBinaryGeneMatrix(geneNames, regulons) {
     for (let regulon of regulons) {
         let vector = "";
         for (let geneName of geneNames) {
-            vector += regulon.targetGenes.find(g => g.name == geneName) ? "1" : "0";
+            vector += regulon.targetGenes.find(g => g.name === geneName) ? "1" : "0";
         }
         matrix[regulon.regulonId] = vector;
     }
@@ -648,7 +698,7 @@ function hammingDist(a, b) {
     let dist = 0;
 
     for (let i = 0; i < a.length; i++) {
-        if (a[i] != b[i]) dist++;
+        if (a[i] !== b[i]) dist++;
     }
 
     return dist;
@@ -665,7 +715,7 @@ function levensteinDist(a, b) {
 
     for (i = 1; i <= b.length; i++) {
         for (j = 1; j <= a.length; j++) {
-            m[i][j] = b.charAt(i - 1) == a.charAt(j - 1)
+            m[i][j] = b.charAt(i - 1) === a.charAt(j - 1)
                 ? m[i - 1][j - 1]
                 : m[i][j] = min(
                     m[i - 1][j - 1] + 1, 

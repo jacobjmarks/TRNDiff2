@@ -32,7 +32,7 @@ const MAX_SIZE = 1000;
 let currentSize = DEFAULT_SIZE;
 
 // The number of wagon wheel graphs currently in the display
-let numGraphs = 0;
+let numWheels = 0;
 
 // The lists of the current clusters in the display
 let currentClusters = -1;
@@ -40,10 +40,14 @@ let currentClusters = -1;
 // For hammer drag and drop of the wagon wheels
 let hammerManager;
 let hammerPosition = [-1, -1];
-let hammerDraggedGraph = -1;
+let hammerDraggedWheel = -1;
 
 // Current search query
 let highlightQuery = -1;
+
+// Stores currently selected regulons and genes
+let selectedRegulons = [];
+let selectedGenes = [];
 
 $(document).ready(() => {
     $("body").append(tooltip = $("<tooltip>")
@@ -60,11 +64,24 @@ $(document).ready(() => {
 
     // Make a variable for the regulons so they are easier to access
     regulons = regulogNetwork.regulons;
-
-    if (regulogNetwork.clusters != null) {
+    
+    // Get any existing selected regulons and genes, and then delete the
+    // temporary attributes
+    if (regulogNetwork.selectedRegulons !== undefined) {
+        selectedRegulons = regulogNetwork.selectedRegulons.slice();
+        delete regulogNetwork.selectedRegulons;
+    }
+    if (regulogNetwork.selectedGenes !== undefined) {
+        selectedGenes = regulogNetwork.selectedGenes.slice();
+        delete regulogNetwork.selectedGenes;
+    }
+    
+    // If there are loaded clusters, draw a clustered display, otherwise draw
+    // a regular display
+    if (regulogNetwork.clusters !== undefined) {
         drawClusteredWagonWheels(regulogNetwork.clusters);
 
-        // Delete the temporary clusters property
+        // Delete the temporary clusters attribute
         delete regulogNetwork.clusters;
     } else {
         drawWagonWheels();
@@ -72,7 +89,7 @@ $(document).ready(() => {
 
     $(window).resize(() => {
         //if ($("#graph #body").html()) drawWagonWheels()
-        if ($("#graph #body").html() && currentClusters != - 1) {
+        if ($("#graph #body").html() && currentClusters !== - 1) {
             drawClusteredWagonWheels(currentClusters)
         }
     })
@@ -80,7 +97,7 @@ $(document).ready(() => {
     $("#btn-zoom-out").click(() => {
         //columns++;
         if (currentSize > MIN_SIZE) currentSize = currentSize - ZOOM_INCREMENT;
-        if (currentClusters != - 1) {
+        if (currentClusters !== - 1) {
             drawClusteredWagonWheels(currentClusters)
         } else {
             drawWagonWheels()
@@ -90,7 +107,7 @@ $(document).ready(() => {
     $("#btn-zoom-in").click(() => {
         //if (columns > 1) columns--;
         if (currentSize < MAX_SIZE) currentSize = currentSize + ZOOM_INCREMENT;
-        if (currentClusters != - 1) {
+        if (currentClusters !== - 1) {
             drawClusteredWagonWheels(currentClusters)
         } else {
             drawWagonWheels()
@@ -131,15 +148,15 @@ function svgElem(tag) {
   */
 function drawWagonWheels() {
 
-    if (regulons.indexOf(undefined) != -1) {
+    if (regulons.indexOf(undefined) !== -1) {
         alert('Warning! Undefined value in regulon list at position ' + regulons.indexOf(undefined));
     }
 
-    numGraphs = 0;
+    numWheels = 0;
     currentClusters = -1;
     hammerPosition[0] = -1;
     hammerPosition[1] = -1;
-    hammerDraggedGraph = -1;
+    hammerDraggedWheel = -1;
 
     //$("#graph").show();
     //svgDivMargin = 14;
@@ -173,19 +190,19 @@ function drawWagonWheels() {
  * @param {Element} div HTML element to append wagonwheel
  */
 function drawWagonWheel(regulon, svgSize, div) {
-    numGraphs++;
+    numWheels++;
 
-    //let svgDiv = $("<div>", {id: "graph" + numGraphs})
+    //let svgDiv = $("<div>", {id: "wheel" + numWheels})
     // I've changed the id to being the regulon's index rather than just the
-    // order the graphs are made so that the graph numbering and regulon order
+    // order the wheels are made so that the wheel numbering and regulon order
     // correspond
-    let graphName;
-    if (regulons.indexOf(regulon) != -1) {
-        graphName = 'graph' + regulons.indexOf(regulon)
+    let wheelName;
+    if (regulons.indexOf(regulon) !== -1) {
+        wheelName = 'wheel' + regulons.indexOf(regulon)
     } else {
-        graphName = graph + numGraphs;
+        wheelName = wheel + numWheels;
     }
-    let svgDiv = $("<div>", {id: graphName})
+    let svgDiv = $("<div>", {id: wheelName})
         .addClass("ui card")
         .addClass("wagonwheel")
         .width(svgSize)
@@ -211,23 +228,47 @@ function drawWagonWheel(regulon, svgSize, div) {
         svgDiv
             .on("mouseover", function() { $(this).css("cursor", "pointer"); })
             .on("mouseout", function() { $(this).css("cursor", "inherit"); })
+            
+            // When the user clicks on a wagon wheel (and not on one of the
+            // target genes), toggle whether the regulon is selected
             .click(function() {
                 let div = $(this);
-                if (!div.hasClass("active")) {
+                
+                // Get the regulon ID
+                let regulonId = $(div).data("regulon-data").regulonId;
+                //if (!div.hasClass("active")) {
+                if (selectedRegulons.indexOf(regulonId) === -1) {
                     div.addClass("active");
                     div.append(
                         $("<div>").addClass("ui right corner green label").append(
                             $("<i>").addClass("check icon")
                         )
                     )
+                    
+                    // Add the regulon ID to the list of selected regulons
+                    selectedRegulons.push(regulonId);
+                    
                 } else {
                     div.removeClass("active");
                     div.find(".label").remove();
+                    
+                    // Remove the regulon ID from the list of selected regulons
+                    selectedRegulons.splice(selectedRegulons.indexOf(regulonId), 1);
                 }
             })
+        // If the selected regulons list contains this regulon, add the classes
+        // for "active" wagon wheels
+        if (selectedRegulons.indexOf(regulon.regulonId) !== -1) {
+            svgDiv.addClass("active");
+            svgDiv.append(
+                $("<div>").addClass("ui right corner green label").append(
+                    $("<i>").addClass("check icon")
+                )
+            )
+        }
     }
 
-    if (regulon.regulonId == regulogNetwork["selected-regulon"]) {
+    if (regulon.regulonId === regulogNetwork["selected-regulon"]) {
         svgDiv.css("border", "1px solid blue");
     }
 
@@ -309,27 +350,35 @@ function drawWagonWheel(regulon, svgSize, div) {
             .mouseout( function () {
                 
                 // Added a new condition - only remove the highlight if the
-                // node currently does not have the "active" class, which is
-                // toggled when clicked on
+                // node's gene is not currently in the list of selected genes
                 let node = $(this);
-                if (!node.hasClass("active")) {
+                let geneName = $(node).data("gene-data").name;
+                if (selectedGenes.indexOf(geneName) === -1) {
                     highlight(color);
                 }
                 tooltip.css("visibility", "hidden");
             })
-            // When clicking on a node, toggle the "active" class as well as
+            // When clicking on a node, toggle it being selected as well as
             // its highlight
             .click(function (event) {
                 event.stopPropagation();
                 let node = $(this);
-                if (!node.hasClass("active")) {
-                    node.addClass("active");
+                let geneName = $(node).data("gene-data").name;
+                if (selectedGenes.indexOf(geneName) === -1) {
                     highlight("blue");
+                    selectedGenes.push(geneName);
                 } else {
-                    node.removeClass("active");
                     highlight(color);
+                    selectedGenes.splice(selectedGenes.indexOf(geneName), 1);
                 }
             })
+    
+        // Make sure selected genes appear highlighted
+        if (selectedGenes.indexOf(gene.name) !== -1) {
+            node.attr("fill", "blue");
+            spoke.css("stroke", "blue");
+        }
+        
         svg.append(node);
     }
 
@@ -403,7 +452,7 @@ function compareSelected(method) {
         for (let j = 1; j < binaryGeneMatrix.length; j++) {
             switch (method) {
                 case "AND":
-                    if (binaryGeneMatrix[0][i] == '1' && binaryGeneMatrix[j][i] == '1') {
+                    if (binaryGeneMatrix[0][i] === '1' && binaryGeneMatrix[j][i] === '1') {
                         resultingMatrix[i] = '1';
                     } else {
                         resultingMatrix[i] = '0';
@@ -411,13 +460,13 @@ function compareSelected(method) {
                     }
                     break;
                 case "OR":
-                    if (binaryGeneMatrix[0][i] == '1' || binaryGeneMatrix[j][i] == '1') {
+                    if (binaryGeneMatrix[0][i] === '1' || binaryGeneMatrix[j][i] === '1') {
                         resultingMatrix[i] = '1';
                         set = true;
                     }
                     break;
                 case "XOR":
-                    if (binaryGeneMatrix[0][i] != binaryGeneMatrix[j][i]) {
+                    if (binaryGeneMatrix[0][i] !== binaryGeneMatrix[j][i]) {
                         resultingMatrix[i] = '1';
                         set = true;
                     }
@@ -439,15 +488,15 @@ function compareSelected(method) {
     }
 
     for (let i = 0; i < resultingMatrix.length; i++) {
-        if (resultingMatrix[i] == '1') result.targetGenes.push(uniqueGenesByName[i]);
+        if (resultingMatrix[i] === '1') result.targetGenes.push(uniqueGenesByName[i]);
     }
 
-    // If the number of graphs is one more than the number of regulons, then
+    // If the number of wheels is one more than the number of regulons, then
     // a comparison wheel has been created previously, and to keep the true
-    // number of graphs, it should be reduced by one before drawWagonWheel is
+    // number of wheels, it should be reduced by one before drawWagonWheel is
     // called
-    if (numGraphs > regulons.length) {
-        numGraphs = regulons.length;
+    if (numWheels > regulons.length) {
+        numWheels = regulons.length;
     }
 
     $("#graph-dimmer .content").empty();
@@ -463,17 +512,17 @@ function compareSelected(method) {
   */
 function drawClusteredWagonWheels(clusters) {
 
-    if (regulons.indexOf(undefined) != -1) {
+    if (regulons.indexOf(undefined) !== -1) {
         alert('Warning! Undefined value in regulon list at position ' + regulons.indexOf(undefined));
     }
 
-    numGraphs = 0;
-    if (currentClusters != clusters) {
+    numWheels = 0;
+    if (currentClusters !== clusters) {
         currentClusters = clusters;
     }
     hammerPosition[0] = -1;
     hammerPosition[1] = -1;
-    hammerDraggedGraph = -1;
+    hammerDraggedWheel = -1;
 
     sortGenes();
 
@@ -495,14 +544,18 @@ function drawClusteredWagonWheels(clusters) {
         let clusterDiv2 =
         $("<div>", {id: 'cluster' + i }).addClass("ui cards centered")
         .css("clear", "both")
+        
+        // Adding a minimum height for the exceptional case where there is only
+        // one wheel, and so dragging it will mean that both cluster containers
+        // are empty
         .css("min-height", currentSize + "px");
 
         clusterDiv.append(clusterDiv2);
 
         div.append(clusterDiv);
         for (let rId of clusters[i]) {
-            //drawWagonWheel(regulons.find(r => r.regulonId == rId), $(clusterDiv).width(), clusterDiv);
-            drawWagonWheel(regulons.find(r => r.regulonId == rId), currentSize, clusterDiv2);
+            //drawWagonWheel(regulons.find(r => r.regulonId === rId), $(clusterDiv).width(), clusterDiv);
+            drawWagonWheel(regulons.find(r => r.regulonId === rId), currentSize, clusterDiv2);
         }
     }
 }
@@ -532,7 +585,7 @@ function updateGoTermLegend(term) {
                 legend.find(".delete.icon").click();
 
                 // If there's a highlight query, clear that before proceeding
-                if (highlightQuery != -1) {
+                if (highlightQuery !== -1) {
                     $("#search-query_buttonSearch").click();
                 }
 
@@ -553,7 +606,7 @@ function updateGoTermLegend(term) {
 function highlightTerm(term, opacity) {
     $.each($(".gene-node"), (i, node) => {
         let gene = $(node).data("gene-data");
-        if (gene.term != term) {
+        if (gene.term !== term) {
             $(`svg circle.gene-node.gene-${gene.name}`).css("opacity", opacity);
             $(`svg line.gene-spoke.gene-${gene.name}`).css("opacity", opacity);
         };
@@ -570,7 +623,7 @@ function sortGenes() {
                     .map(r => r.targetGenes)
                     .reduce((a, b) => a.concat(b), [])
                     .reduce((a, b) => {
-                        if (!a.find(g => g.name == b.name)) {
+                        if (!a.find(g => g.name === b.name)) {
                             a.push(b);
                         }
                         return a;
@@ -633,28 +686,29 @@ function hammerPan (ev) {
     console.log('Hammer pan occured');
     //document.getElementById('body').style.backgroundColor = "green";
 
-    // Only do something if a graph is already being dragged
-    if (hammerDraggedGraph != -1) {
+    // Only do something if a wheel is already being dragged
+    if (hammerDraggedWheel !== -1) {
 
-        // Place the graph in the new location, based on adding the current
+        // Place the wheel in the new location, based on adding the current
         // distance panned to the stored distance. The distance is counted
         // from the initial touch position
-        hammerDraggedGraph.style.left = hammerPosition[0] + ev.deltaX + "px";
-        hammerDraggedGraph.style.top = hammerPosition[1] + ev.deltaY + "px";
+        wheel = document.getElementById('wheel' + hammerDraggedWheel)
+        wheel.style.left = hammerPosition[0] + ev.deltaX + "px";
+        wheel.style.top = hammerPosition[1] + ev.deltaY + "px";
     }
 }
 
 /**
   * Event listener for Hammer 'panstart' events
-  * If the event started on a graph, set that graph as being dragged and set its attributes to allow change of position
+  * If the event started on a wheel, set that wheel as being dragged and set its attributes to allow change of position
   * @param {event} The parameters of the Hammer event
   */
 function hammerPanStart (ev) {
     console.log('Hammer panstart occured');
     //document.getElementById('body').style.backgroundColor = "blue";
 
-    // Only do something if a graph is not already being dragged
-    if (hammerDraggedGraph == -1) {
+    // Only do something if a wheel is not already being dragged
+    if (hammerDraggedWheel === -1) {
         // Get the location of the event
         let x = ev.center.x;
         let y = ev.center.y;
@@ -669,31 +723,31 @@ function hammerPanStart (ev) {
         //console.log('Calculated absolute coordinates are ' + mouseX + ', ' + mouseY);
         console.log('Mouse coordinates are ' + mouseX + ', ' + mouseY);
 
-        let currentGraphIndex = -1;
-        let currentGraphPosition = -1;
+        let currentWheelIndex = -1;
+        let currentWheelPosition = -1;
 
-        // For every graph, check if the event occurred inside their container
-        //for (let i = 0; i < numGraphs; i++) {
+        // For every wheel, check if the event occurred inside their container
+        //for (let i = 0; i < numWheels; i++) {
         for (let i = 0; i < regulons.length; i++) {
 
-            currentGraphPosition = $('#graph' + i).offset();
-            let width = $('#graph' + i).width();
-            let height = $('#graph' + i).height();
-            console.log('Wheel ' + i + ' top left is at ' + currentGraphPosition.left + ', ' + currentGraphPosition.top + '; height and width are ' + height + ', ' + width);
+            currentWheelPosition = $('#wheel' + i).offset();
+            let width = $('#wheel' + i).width();
+            let height = $('#wheel' + i).height();
+            console.log('Wheel ' + i + ' top left is at ' + currentWheelPosition.left + ', ' + currentWheelPosition.top + '; height and width are ' + height + ', ' + width);
 
-            if (mouseX >= currentGraphPosition.left && mouseX <= currentGraphPosition.left + width && mouseY >= currentGraphPosition.top && mouseY <= currentGraphPosition.top + height) {
-                console.log('Pan was inside graph' + i);
-                currentGraphIndex = i;
+            if (mouseX >= currentWheelPosition.left && mouseX <= currentWheelPosition.left + width && mouseY >= currentWheelPosition.top && mouseY <= currentWheelPosition.top + height) {
+                console.log('Pan was inside wheel' + i);
+                currentWheelIndex = i;
                 break;
             }
         }
 
-        // Don't do anything if the pan wasn't in a graph
-        if (currentGraphIndex == -1) return;
+        // Don't do anything if the pan wasn't in a wheel
+        if (currentWheelIndex === -1) return;
 
-        // Get the graph's cluster as well if there are clusters
+        // Get the wheel's cluster as well if there are clusters
         let currentClusterIndex = -1;
-        if (currentClusters != -1) {
+        if (currentClusters !== -1) {
             for (let i = 0; i < currentClusters.length; i++) {
 
                 let currentClusterPosition = $('#cluster' + i).offset();
@@ -709,35 +763,36 @@ function hammerPanStart (ev) {
             }
         }
 
-        // Get the graph element
-        hammerDraggedGraph = document.getElementById('graph' + currentGraphIndex);
+        // Get the wheel element
+        hammerDraggedWheel = currentWheelIndex;
 
-        // Init hammer positions for the graph to be dragged
-        if (hammerPosition == null) {
+        // Initialise hammer positions for the wheel to be dragged
+        if (hammerPosition === undefined) {
             hammerPosition = [ -1, -1 ];
         }
 
-        // Calculate exact top left position for the graph relative to the
+        // Calculate exact top left position for the wheel relative to the
         // parent element
         let parentPosition;
-        if (currentClusterIndex != -1) {
+        if (currentClusterIndex !== -1) {
             parentPosition = $('#cluster' + currentClusterIndex).offset();
         } else {
             parentPosition = $('#body').offset();
         }
-        let leftPosition = currentGraphPosition.left - parentPosition.left;
-        let topPosition = currentGraphPosition.top - parentPosition.top;
+        let leftPosition = currentWheelPosition.left - parentPosition.left;
+        let topPosition = currentWheelPosition.top - parentPosition.top;
 
         // If the current location hasn't been stored yet, store the X and
         // Y position from the above, as well as applying it as attributes
-        // to the graph, and making it absolute positioned
-        if (hammerPosition[0] == -1) {
-            hammerDraggedGraph.style.left = leftPosition + "px";
+        // to the wheel, and making it absolute positioned
+        if (hammerPosition[0] === -1) {
+            wheel = document.getElementById('wheel' + hammerDraggedWheel)
+            wheel.style.left = leftPosition + "px";
             hammerPosition[0] = leftPosition;
-            hammerDraggedGraph.style.top = topPosition + "px";
+            wheel.style.top = topPosition + "px";
             hammerPosition[1] = topPosition;
-            hammerDraggedGraph.style.position = "absolute";
-            hammerDraggedGraph.style.zIndex = 5;
+            wheel.style.position = "absolute";
+            wheel.style.zIndex = 5;
         }
     }
 }
@@ -751,8 +806,8 @@ function hammerPanEnd (ev) {
     console.log('Hammer panend occured');
     //document.getElementById('body').style.backgroundColor = "yellow";
 
-    // Only do something if a graph is already being dragged
-    if (hammerDraggedGraph != -1) {
+    // Only do something if a wheel is already being dragged
+    if (hammerDraggedWheel !== -1) {
 
         // Get the location of the event
         let x = ev.center.x;
@@ -766,24 +821,24 @@ function hammerPanEnd (ev) {
 
         // Check to see what the new order should be
 
-        // To (eventually) create the order, both the graph ids to consider
-        // and the regulon ids are required
+        // To (eventually) create the order, both the wheel ids to consider
+        // and the regulon ID are required
 
-        // Get the ones for the dragged graph first
-        // The graph's number is extracted from the id it was given when
-        // created
-        let draggedGraphNumber = parseInt(hammerDraggedGraph.id.substring(5));
-        let draggedGraphRegulonId = regulons[draggedGraphNumber].regulonId;
-        console.log("graph " + draggedGraphNumber + "(" + regulons[draggedGraphNumber].genomeName + ") was the graph being dragged");
+        // Get the ones for the dragged wheel first
+        let draggedWheelNumber = hammerDraggedWheel;
+        
+        // The regulon ID will always share the same index as that of the wheel
+        let draggedWheelRegulonId = regulons[draggedWheelNumber].regulonId;
+        console.log("wheel " + draggedWheelNumber + "(" + regulons[draggedWheelNumber].genomeName + ") was the wheel being dragged");
 
         // The index of the wheel is not necessarily the same as the
         // number, in the case of re-ordered clusters. In this case we find
         // the index of the correct regulonId in the correct cluster
-        let draggedGraphIndex;
-        if (currentClusters != -1) {
+        let draggedWheelIndex;
+        if (currentClusters !== -1) {
             for (let i = 0; i < currentClusters.length; i++) {
-                if (currentClusters[i].indexOf(draggedGraphRegulonId) != -1) {
-                    draggedGraphIndex = currentClusters[i].indexOf(draggedGraphRegulonId);
+                if (currentClusters[i].indexOf(draggedWheelRegulonId) !== -1) {
+                    draggedWheelIndex = currentClusters[i].indexOf(draggedWheelRegulonId);
                     break;
                 }
             }
@@ -794,27 +849,27 @@ function hammerPanEnd (ev) {
         // is changed either with a sort function or through this drag and
         // drop, it can be assumed that the index of the dragged wheel is
         // the same as that of the regulon that gave it its number - hence
-        // the same as draggedGraphNumber
+        // the same as draggedWheelNumber
         else {
-            draggedGraphIndex = draggedGraphNumber;
+            draggedWheelIndex = draggedWheelNumber;
         }
 
-        // The list of graphs to compare the positions against
-        let graphsToCompare = [];
+        // The list of wheels to compare the positions against
+        let wheelsToCompare = [];
 
-        // Clustered graphs need to be considered differently, so check for
-        // that case first. We also need to check which cluster the graph
+        // Clustered wheels need to be considered differently, so check for
+        // that case first. We also need to check which cluster the wheel
         // was dragged to, and which it started in
         let currentClusterIndex = -1;
         let oldClusterIndex = -1;
-        if (currentClusters != -1) {
+        if (currentClusters !== -1) {
 
             // First, get the *max* cluster div height. The hidden div that
-            // contains the graphs only "exists" directly around the graph
-            // elements, so if a cluster has less graphs than another, the
+            // contains the wheels only "exists" directly around the wheel
+            // elements, so if a cluster has less wheels than another, the
             // div may not "exist" in the entire visible cluster. Using the
             // largest cluster height will ensure that if a user drags a
-            // graph into a cluster, it will be put in that cluster
+            // wheel into a cluster, it will be put in that cluster
             let MaxClusterHeight = 0;
             for (let i = 0; i < currentClusters.length; i++) {
                 if (MaxClusterHeight < $('#cluster' + i).height()) {
@@ -825,7 +880,7 @@ function hammerPanEnd (ev) {
             // For all clusters...
             for (let i = 0; i < currentClusters.length; i++) {
 
-                if (currentClusterIndex == -1) {
+                if (currentClusterIndex === -1) {
                     // Get the position and dimensions of the cluster container
                     // to see if the mouse position is inside it
                     let currentClusterPosition = $('#cluster' + i).offset();
@@ -843,10 +898,10 @@ function hammerPanEnd (ev) {
                     }
                 }
 
-                if (oldClusterIndex == -1) {
-                    // Also check if this is original cluster for this graph (so it can be
+                if (oldClusterIndex === -1) {
+                    // Also check if this is original cluster for this wheel (so it can be
                     // removed from it if it is a different one)
-                    if (currentClusters[i].indexOf(draggedGraphRegulonId) != -1) {
+                    if (currentClusters[i].indexOf(draggedWheelRegulonId) !== -1) {
                         oldClusterIndex = i;
                     }
                 }
@@ -854,88 +909,88 @@ function hammerPanEnd (ev) {
 
             // If the mouse is not over any cluster, end the drag without
             // changing the position of anything
-            if (currentClusterIndex == -1) {
-                console.log("graph " + draggedGraphNumber + "(" + regulons[draggedGraphNumber].genomeName + ") was dragged outside of the clusters, so don't do anything");
+            if (currentClusterIndex === -1) {
+                console.log("wheel " + draggedWheelNumber + "(" + regulons[draggedWheelNumber].genomeName + ") was dragged outside of the clusters, so don't do anything");
                 resetDraggedWheel();
                 return;
 
-            // Otherwise get the graph indexes of all the graphs in that
-            // cluster (except for the dragged graph if it was in that
+            // Otherwise get the wheel indexes of all the wheels in that
+            // cluster (except for the dragged wheel if it was in that
             // cluster as well)
             } else {
-                console.log("graph " + draggedGraphNumber + "(" + regulons[draggedGraphNumber].genomeName + ") was dragged from cluster " + oldClusterIndex + " to cluster " + currentClusterIndex);
+                console.log("wheel " + draggedWheelNumber + "(" + regulons[draggedWheelNumber].genomeName + ") was dragged from cluster " + oldClusterIndex + " to cluster " + currentClusterIndex);
 
                 // For every regulonId listed in the current cluster...
                 for (let regulonId of currentClusters[currentClusterIndex]) {
 
                     // Get the corresponding regulon object and store
                     // its index in the list of regulons, which should
-                    // be the same as the graph's id number
-                    let regulon = regulons.find(r => r.regulonId == regulonId);
-                    graphsToCompare.push(regulons.indexOf(regulon));
+                    // be the same as the wheel's id number
+                    let regulon = regulons.find(r => r.regulonId === regulonId);
+                    wheelsToCompare.push(regulons.indexOf(regulon));
                 }
             }
 
-        // Otherwise just list all graphs
+        // Otherwise just list all wheels
         } else {
-            //for (let i = 0; i < numGraphs; i++) {
+            //for (let i = 0; i < numWheels; i++) {
             for (let i = 0; i < regulons.length; i++) {
-                graphsToCompare.push(i);
+                wheelsToCompare.push(i);
             }
         }
 
-        // The current index of the graph that is closest to the mouse X
+        // The current index of the wheel that is closest to the mouse X
         // and Y
-        let closestGraphIndex = -1;
+        let closestWheelIndex = -1;
 
-        // The current closest distance between a non-dragged graph and the
+        // The current closest distance between a non-dragged wheel and the
         // mouse X and Y
         let closestDistance = Number.MAX_SAFE_INTEGER;
 
         //For every network in the container, check its actual distance
         //from the mouse cursor's position
-        console.log("Determining the closest graph to the drop position");
+        console.log("Determining the closest wheel to the drop position");
 
-        // For each graph in the list of graphs in the target group...
-        for (let i = 0; i < graphsToCompare.length; i++) {
+        // For each wheel in the list of wheels in the target group...
+        for (let i = 0; i < wheelsToCompare.length; i++) {
 
-            // If it is not the dragged graph...
-            if (graphsToCompare[i] != draggedGraphNumber) {
+            // If it is not the dragged wheel...
+            if (wheelsToCompare[i] !== draggedWheelNumber) {
 
                 //Calculate the centre of the current network
-                let compareGraphPosition = $('#graph' + graphsToCompare[i]).offset();
-                let compareGraphWidth = $('#graph' + graphsToCompare[i]).width();
-                let compareGraphHeight = $('#graph' + graphsToCompare[i]).height();
+                let compareWheelPosition = $('#wheel' + wheelsToCompare[i]).offset();
+                let compareWheelWidth = $('#wheel' + wheelsToCompare[i]).width();
+                let compareWheelHeight = $('#wheel' + wheelsToCompare[i]).height();
 
-                let compareGraphCenterX = compareGraphPosition.left + (compareGraphWidth / 2);
-                let compareGraphCenterY = compareGraphPosition.top + (compareGraphHeight / 2);
+                let compareWheelCenterX = compareWheelPosition.left + (compareWheelWidth / 2);
+                let compareWheelCenterY = compareWheelPosition.top + (compareWheelHeight / 2);
 
-                console.log('graph ' + graphsToCompare[i] + "(" + regulons[graphsToCompare[i]].genomeName + ", index " + i + ") centre = " + compareGraphCenterX + ", " + compareGraphCenterY);
+                console.log('wheel ' + wheelsToCompare[i] + "(" + regulons[wheelsToCompare[i]].genomeName + ", index " + i + ") centre = " + compareWheelCenterX + ", " + compareWheelCenterY);
 
                 //Determine the distance between the current centre and the
                 //touch's position using Pythagoras
-                let currentDistance = Math.sqrt(Math.pow(mouseX - compareGraphCenterX, 2) + Math.pow(mouseY - compareGraphCenterY, 2));
+                let currentDistance = Math.sqrt(Math.pow(mouseX - compareWheelCenterX, 2) + Math.pow(mouseY - compareWheelCenterY, 2));
 
-                console.log('graph ' + graphsToCompare[i] + "(" + regulons[graphsToCompare[i]].genomeName + ", index " + i + ") centre is " + currentDistance + " away.");
+                console.log('wheel ' + wheelsToCompare[i] + "(" + regulons[wheelsToCompare[i]].genomeName + ", index " + i + ") centre is " + currentDistance + " away.");
 
                 //If the calculated distance is less than the current closest,
                 //this network is the new closest
                 if (currentDistance < closestDistance) {
                     closestDistance = currentDistance;
-                    closestGraphIndex = i;
+                    closestWheelIndex = i;
 
-                    console.log('graph ' + graphsToCompare[i] + "(" + regulons[graphsToCompare[i]].genomeName + ", index " + i + ") is the new closest.");
+                    console.log('wheel ' + wheelsToCompare[i] + "(" + regulons[wheelsToCompare[i]].genomeName + ", index " + i + ") is the new closest.");
                 }
             }
         }
 
-        // If we found a closest network, determine where the dragged graph
+        // If we found a closest network, determine where the dragged wheel
         // will be placed. If it is horizontally to the left of the closest
         // network, place it in front of it. If it is horizontally to the
         // right, place it behind it. There is an also a special case if
-        // the closest graph is below everything in the container, in which
+        // the closest wheel is below everything in the container, in which
         // case it should always appear at the end
-        if (closestGraphIndex > -1) {
+        if (closestWheelIndex > -1) {
 
             let newPosition = -1;
 
@@ -950,121 +1005,121 @@ function hammerPanEnd (ev) {
             //  left network
             //      - put the dropped network in place of that network
 
-            // Get the X and Y coordinates of the "last" graph in the
+            // Get the X and Y coordinates of the "last" wheel in the
             // container
-            let lastGraphIndex = -1;
+            let lastWheelIndex = -1;
 
-            if (graphsToCompare[graphsToCompare.length - 1] == draggedGraphNumber) {
-                lastGraphIndex = graphsToCompare.length - 2;
+            if (wheelsToCompare[wheelsToCompare.length - 1] === draggedWheelNumber) {
+                lastWheelIndex = wheelsToCompare.length - 2;
             } else {
-                lastGraphIndex = graphsToCompare.length - 1;
+                lastWheelIndex = wheelsToCompare.length - 1;
             }
-            let lastGraphPosition = $('#graph' + graphsToCompare[lastGraphIndex]).offset();
-            let lastGraphWidth = $('#graph' + graphsToCompare[lastGraphIndex]).width();
-            let lastGraphHeight = $('#graph' + graphsToCompare[lastGraphIndex]).height();
-            let lastGraphX = lastGraphPosition.left;
-            let lastGraphY = lastGraphPosition.top;
+            let lastWheelPosition = $('#wheel' + wheelsToCompare[lastWheelIndex]).offset();
+            let lastWheelWidth = $('#wheel' + wheelsToCompare[lastWheelIndex]).width();
+            let lastWheelHeight = $('#wheel' + wheelsToCompare[lastWheelIndex]).height();
+            let lastWheelX = lastWheelPosition.left;
+            let lastWheelY = lastWheelPosition.top;
 
             //Find the network that is at the bottom left
-            let bottomLeftGraphIndex = -1;
-            let bottomLeftGraphX = Number.MAX_SAFE_INTEGER;
+            let bottomLeftWheelIndex = -1;
+            let bottomLeftWheelX = Number.MAX_SAFE_INTEGER;
 
-            // For each graph in the list of graphs in the target group
-            for (let i = 0; i < graphsToCompare.length; i++) {
+            // For each wheel in the list of wheels in the target group
+            for (let i = 0; i < wheelsToCompare.length; i++) {
 
-                // If it is not the dragged graph...
-                if (graphsToCompare[i] != draggedGraphNumber) {
+                // If it is not the dragged wheel...
+                if (wheelsToCompare[i] !== draggedWheelNumber) {
 
-                    // Get that graph's X and Y coordinates
-                    let compareGraphPosition = $('#graph' + graphsToCompare[i]).offset();
-                    let compareGraphX = compareGraphPosition.left;
-                    let compareGraphY = compareGraphPosition.top;
+                    // Get that wheel's X and Y coordinates
+                    let compareWheelPosition = $('#wheel' + wheelsToCompare[i]).offset();
+                    let compareWheelX = compareWheelPosition.left;
+                    let compareWheelY = compareWheelPosition.top;
 
-                    // If this graph is on the same Y value as the last graph,
+                    // If this wheel is on the same Y value as the last wheel,
                     // and its X coordinate is less than the X coordinate of
                     // the current "bottom left" network, store it and its
                     // X coordinate
-                    if (compareGraphY == lastGraphY && compareGraphX < bottomLeftGraphX) {
-                        bottomLeftGraphX = compareGraphX;
-                        bottomLeftGraphIndex = i;
+                    if (compareWheelY === lastWheelY && compareWheelX < bottomLeftWheelX) {
+                        bottomLeftWheelX = compareWheelX;
+                        bottomLeftWheelIndex = i;
                     }
                 }
             }
 
-            // If there is a "last" graph and the mouse X and Y is greater
-            // than that graph's X and Y, put the dragged graph at the end
+            // If there is a "last" wheel and the mouse X and Y is greater
+            // than that wheel's X and Y, put the dragged wheel at the end
             // of the group
-            if ((mouseX > lastGraphX + lastGraphWidth && mouseY > lastGraphY) || (mouseY > lastGraphY + lastGraphHeight && mouseX > lastGraphX)) {
+            if ((mouseX > lastWheelX + lastWheelWidth && mouseY > lastWheelY) || (mouseY > lastWheelY + lastWheelHeight && mouseX > lastWheelX)) {
 
                 // If the wheel was moved to a new cluster, *or* was the
-                // last graph originally, add one to the index
-                if (oldClusterIndex != currentClusterIndex || (graphsToCompare[graphsToCompare.length - 1] == draggedGraphNumber)) {
-                    newPosition = lastGraphIndex + 1;
+                // last wheel originally, add one to the index
+                if (oldClusterIndex !== currentClusterIndex || (wheelsToCompare[wheelsToCompare.length - 1] === draggedWheelNumber)) {
+                    newPosition = lastWheelIndex + 1;
                 } else {
-                    newPosition = lastGraphIndex;
+                    newPosition = lastWheelIndex;
                 }
-                console.log("The drop location is to the right and below the last graph - put the dragged graph at the end of the container");
+                console.log("The drop location is to the right and below the last wheel - put the dragged wheel at the end of the container");
             }
 
-            // Else, if there is a "bottom left" graph and the mouse X is
+            // Else, if there is a "bottom left" wheel and the mouse X is
             // less than its X coordinate, and more than its Y coordinate,
-            // put the dragged graph in front of that graph
-            else if ((mouseX < bottomLeftGraphX) && (mouseY > lastGraphY)) {
-                newPosition = bottomLeftGraphIndex;
+            // put the dragged wheel in front of that wheel
+            else if ((mouseX < bottomLeftWheelX) && (mouseY > lastWheelY)) {
+                newPosition = bottomLeftWheelIndex;
 
-                // If the graph is moving to a position *after* its
+                // If the wheel is moving to a position *after* its
                 // original position, subtract one from the new index
-                if (newPosition > draggedGraphIndex) {
+                if (newPosition > draggedWheelIndex) {
                     newPosition -= 1;
                 }
-                console.log("The drop location is to the left and below the bottom left graph - put the dragged graph in front of it in the order");
+                console.log("The drop location is to the left and below the bottom left wheel - put the dragged wheel in front of it in the order");
             }
 
             // Otherwise, if it's not too far down, check if it is left or
-            // right of the closest graph
+            // right of the closest wheel
             else {
-                let closestGraphPosition = $('#graph' + closestGraphIndex).offset();
-                let closestGraphWidth = $('#graph' + closestGraphIndex).width();
-                let closestGraphCenterX = closestGraphPosition.left + (closestGraphWidth / 2);
+                let closestWheelPosition = $('#wheel' + closestWheelIndex).offset();
+                let closestWheelWidth = $('#wheel' + closestWheelIndex).width();
+                let closestWheelCenterX = closestWheelPosition.left + (closestWheelWidth / 2);
 
-                if (closestGraphCenterX > mouseX) {
-                    console.log('The closest graph is to the right of the mouse location - put the dragged graph in front of it in the order');
-                    newPosition = closestGraphIndex;
+                if (closestWheelCenterX > mouseX) {
+                    console.log('The closest wheel is to the right of the mouse location - put the dragged wheel in front of it in the order');
+                    newPosition = closestWheelIndex;
 
-                    // If the graph is moving to a position *after* its
+                    // If the wheel is moving to a position *after* its
                     // original position, subtract one from the new index
-                    if (newPosition > draggedGraphIndex) {
+                    if (newPosition > draggedWheelIndex) {
                         newPosition -= 1;
                     }
                 } else {
-                    console.log('The closest graph is to the left of the mouse location - put the dragged graph behind it in the order');
-                    newPosition = closestGraphIndex + 1;
+                    console.log('The closest wheel is to the left of the mouse location - put the dragged wheel behind it in the order');
+                    newPosition = closestWheelIndex + 1;
 
-                    // If the graph is moving to a position *after* its
+                    // If the wheel is moving to a position *after* its
                     // original position, subtract one from the new index
-                    if (newPosition > draggedGraphIndex) {
+                    if (newPosition > draggedWheelIndex) {
                         newPosition -= 1;
                     }
                 }
             }
 
             // Cluster case
-            if (currentClusters != -1) {
+            if (currentClusters !== -1) {
 
                 // Have to do the log entry here otherwise the regulon
                 // will be incorrect!
-                console.log('graph ' + draggedGraphNumber + '(' + regulons[draggedGraphNumber].genomeName + ') was placed in position ' + newPosition + ' in cluster ' + currentClusterIndex);
+                console.log('wheel ' + draggedWheelNumber + '(' + regulons[draggedWheelNumber].genomeName + ') was placed in position ' + newPosition + ' in cluster ' + currentClusterIndex);
 
                 // If moving within the same cluster...
-                if (oldClusterIndex == currentClusterIndex) {
+                if (oldClusterIndex === currentClusterIndex) {
 
                     // Move in the cluster object
-                    array_move(currentClusters[currentClusterIndex], currentClusters[currentClusterIndex].indexOf(draggedGraphRegulonId), newPosition);
+                    array_move(currentClusters[currentClusterIndex], currentClusters[currentClusterIndex].indexOf(draggedWheelRegulonId), newPosition);
 
                     // Move in the regulon collection (to be in front of
                     // the one it was moved in front of)
-                    /*let positionRegulon = regulons.find(r => r.regulonId == currentClusters[currentClusterIndex][newPosition]);
-                    let draggedRegulon = regulons.find(r => r.regulonId == draggedGraphRegulonId);*/
+                    /*let positionRegulon = regulons.find(r => r.regulonId === currentClusters[currentClusterIndex][newPosition]);
+                    let draggedRegulon = regulons.find(r => r.regulonId === draggedWheelRegulonId);*/
 
                     // Uses regulogNetwork to be safe
                     //array_move(regulogNetwork.regulons, regulogNetwork.regulons.indexOf(draggedRegulon), regulogNetwork.regulons.indexOf(positionRegulon));
@@ -1076,19 +1131,19 @@ function hammerPanEnd (ev) {
                     // Go through the original cluster's list and remove the
                     // dragged regulon id
                     for ( let i = 0; i < currentClusters[oldClusterIndex].length; i++) {
-                        if (currentClusters[oldClusterIndex][i] == draggedGraphRegulonId) {
+                        if (currentClusters[oldClusterIndex][i] === draggedWheelRegulonId) {
                             currentClusters[oldClusterIndex].splice(i, 1);
                             break;
                         }
                     }
 
                     // Put the dragged regulon id in the new cluster
-                    currentClusters[currentClusterIndex].splice(newPosition, 0, draggedGraphRegulonId);
+                    currentClusters[currentClusterIndex].splice(newPosition, 0, draggedWheelRegulonId);
 
                     // Move in the regulon collection (to be in front of
                     // the one it was moved in front of)
-                    /*let positionRegulon = regulons.find(r => r.regulonId == currentClusters[currentClusterIndex][newPosition]);
-                    let draggedRegulon = regulons.find(r => r.regulonId == draggedGraphRegulonId)*/
+                    /*let positionRegulon = regulons.find(r => r.regulonId === currentClusters[currentClusterIndex][newPosition]);
+                    let draggedRegulon = regulons.find(r => r.regulonId === draggedWheelRegulonId)*/
 
                     // Uses regulogNetwork to be safe
                     //array_move(regulogNetwork.regulons, regulogNetwork.regulons.indexOf(draggedRegulon), regulogNetwork.regulons.indexOf(positionRegulon));
@@ -1103,11 +1158,11 @@ function hammerPanEnd (ev) {
 
                 // Have to do the log entry here otherwise the regulon
                 // will be incorrect!
-                console.log('graph ' + draggedGraphNumber + '(' + regulons[draggedGraphNumber].genomeName + ') was placed in position ' + newPosition)
+                console.log('wheel ' + draggedWheelNumber + '(' + regulons[draggedWheelNumber].genomeName + ') was placed in position ' + newPosition)
 
                 // Move in the regulon collection (to be in front of
                 // the one it was moved in front of)
-                let draggedRegulon = regulons.find(r => r.regulonId == draggedGraphRegulonId)
+                let draggedRegulon = regulons.find(r => r.regulonId === draggedWheelRegulonId)
 
                 // Uses regulogNetwork to be safe
                 array_move(regulogNetwork.regulons, regulogNetwork.regulons.indexOf(draggedRegulon), newPosition);
@@ -1121,31 +1176,31 @@ function hammerPanEnd (ev) {
         //Else append it to the end of the group - this should only
         //occur if the container is empty
         else {
-            console.log('No closest graph was found!');
-            // If this is a clustered display and the graph moved to a new
+            console.log('No closest wheel was found!');
+            // If this is a clustered display and the wheel moved to a new
             // cluster, put it in that (empty) cluster
-            if (currentClusters != -1 && oldClusterIndex != currentClusterIndex) {
+            if (currentClusters !== -1 && oldClusterIndex !== currentClusterIndex) {
 
                 // Go through the original cluster's list and remove the
                 // dragged regulon id
                 for ( let i = 0; i < currentClusters[oldClusterIndex].length; i++) {
-                    if (currentClusters[oldClusterIndex][i] == draggedGraphRegulonId) {
+                    if (currentClusters[oldClusterIndex][i] === draggedWheelRegulonId) {
                         currentClusters[oldClusterIndex].splice(i, 1);
                         break;
                     }
                 }
 
                 // Put the dragged regulon id in the (empty) new cluster
-                currentClusters[currentClusterIndex].push(draggedGraphRegulonId)
+                currentClusters[currentClusterIndex].push(draggedWheelRegulonId)
 
                 // Redraw the wagon wheels and end after that
-                console.log('graph ' + draggedGraphNumber + '(' + regulons[draggedGraphNumber].genomeName + ') was placed in the empty cluster ' + currentClusterIndex);
+                console.log('wheel ' + draggedWheelNumber + '(' + regulons[draggedWheelNumber].genomeName + ') was placed in the empty cluster ' + currentClusterIndex);
                 drawClusteredWagonWheels(currentClusters);
                 return;
             }
 
             // Otherwise just reset the display since nothing should happen
-            console.log('This was the only graph in its group, so do nothing');
+            console.log('This was the only wheel in its group, so do nothing');
             resetDraggedWheel();
             return;
         }
@@ -1161,8 +1216,8 @@ function hammerPanCancel (ev) {
     console.log('Hammer pancancel occured');
     //document.getElementById('body').style.backgroundColor = "purple";
 
-    // Only do something if a graph is already being dragged
-    if (hammerDraggedGraph != -1) {
+    // Only do something if a wheel is already being dragged
+    if (hammerDraggedWheel !== -1) {
         resetDraggedWheel();
     }
 }
@@ -1171,13 +1226,14 @@ function hammerPanCancel (ev) {
  * Clears the dragging of a wagon wheel if no changes are to be made to ordering
  */
 function resetDraggedWheel() {
-    hammerDraggedGraph.style.left = null;
+    wheel = document.getElementById('wheel' + hammerDraggedWheel)
+    wheel.style.left = null;
     hammerPosition[0] = -1;
-    hammerDraggedGraph.style.top = null;
+    wheel.style.top = null;
     hammerPosition[1] = -1;
-    hammerDraggedGraph.style.position = null;
-    hammerDraggedGraph.style.zIndex = null;
-    hammerDraggedGraph = -1;
+    wheel.style.position = null;
+    wheel.style.zIndex = null;
+    hammerDraggedWheel = -1;
 }
 
 /**
@@ -1209,7 +1265,7 @@ function setUpQueryHighlight() {
     
     // Trigger a query highlight if the user presses enter
     $("#search-query_text").keyup((event) => {
-        if (event.which == 13 && $("#search-query_text").val() != "") {
+        if (event.which === 13 && $("#search-query_text").val() !== "") {
             $("#search-query_buttonSearch").click()
         }
     });
@@ -1247,7 +1303,7 @@ function setUpQueryHighlight() {
     $("#search-query_buttonClear").click(() => {
 
         // Clear the query if it exists
-        if (highlightQuery != -1) {
+        if (highlightQuery !== -1) {
             highlightQuery = -1;
 
             // This is based on Joe's code for highilghting via term
