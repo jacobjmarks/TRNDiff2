@@ -200,7 +200,7 @@ function drawWagonWheel(regulon, svgSize, div) {
     if (regulons.indexOf(regulon) !== -1) {
         wheelName = 'wheel' + regulons.indexOf(regulon)
     } else {
-        wheelName = wheel + numWheels;
+        wheelName = 'wheel' + numWheels;
     }
     let svgDiv = $("<div>", {id: wheelName})
         .addClass("ui card")
