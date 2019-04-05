@@ -794,6 +794,10 @@ function hammerPanStart (ev) {
             wheel.style.position = "absolute";
             wheel.style.zIndex = 5;
         }
+        
+        // If a graph is being dragged, scrolling will be temporarily disabled
+        // since that causes odd results
+        disableScroll();
     }
 }
 
@@ -805,6 +809,9 @@ function hammerPanStart (ev) {
 function hammerPanEnd (ev) {
     console.log('Hammer panend occured');
     //document.getElementById('body').style.backgroundColor = "yellow";
+    
+    // Re-enable scrolling after the panning action
+    enableScroll();
 
     // Only do something if a wheel is already being dragged
     if (hammerDraggedWheel !== -1) {
@@ -1215,6 +1222,9 @@ function hammerPanEnd (ev) {
 function hammerPanCancel (ev) {
     console.log('Hammer pancancel occured');
     //document.getElementById('body').style.backgroundColor = "purple";
+    
+    // Re-enable scrolling after the panning action
+    enableScroll();
 
     // Only do something if a wheel is already being dragged
     if (hammerDraggedWheel !== -1) {
@@ -1314,4 +1324,54 @@ function setUpQueryHighlight() {
             });
         }
     });
+}
+
+// Following four functions are from https://stackoverflow.com/questions/4770025/how-to-disable-scrolling-temporarily
+// left: 37, up: 38, right: 39, down: 40,
+// spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+var keys = {37: 1, 38: 1, 39: 1, 40: 1};
+
+/**
+  * Prevents the default handler for an element event
+  */
+function preventDefault(e) {
+  e = e || window.event;
+  if (e.preventDefault)
+      e.preventDefault();
+  e.returnValue = false;  
+}
+
+/**
+  * Prevents the default handler for an element event for certain keys
+  */
+function preventDefaultForScrollKeys(e) {
+    if (keys[e.keyCode]) {
+        preventDefault(e);
+        return false;
+    }
+}
+
+/**
+  * Disables the default events that would result in scrolling
+  * Used after a Hammer pan that moved a graph begins
+  */
+function disableScroll() {
+  if (window.addEventListener) // older FF
+      window.addEventListener('DOMMouseScroll', preventDefault, false);
+  window.onwheel = preventDefault; // modern standard
+  window.onmousewheel = document.onmousewheel = preventDefault; // older browsers, IE
+  window.ontouchmove  = preventDefault; // mobile
+  document.onkeydown  = preventDefaultForScrollKeys;
+}
+/**
+  * Enables the default events that would result in scrolling
+  * Used after a Hammer pan that moved a graph is complete
+  */
+function enableScroll() {
+    if (window.removeEventListener)
+        window.removeEventListener('DOMMouseScroll', preventDefault, false);
+    window.onmousewheel = document.onmousewheel = null; 
+    window.onwheel = null; 
+    window.ontouchmove = null;  
+    document.onkeydown = null;  
 }
